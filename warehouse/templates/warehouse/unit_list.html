@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %} {% block content %}
+{% load jalali_tags %}
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    <a class="btn btn-primary" style="float: left;" href="{% url 'unit_add' %}">+
+    ثبت یکا (واحد) جدید    
+    </a>
+
+    {% if units %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">ردیف</th>
+                <th scope="col">نام واحد</th>
+                <th scope="col">ثبت شده توسط</th>
+                <th scope="col">تاریخ ثبت</th>
+    
+            </tr>
+        </thead>
+        <tbody>
+            {% for unit in units %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><a href="{{unit.get_edit_url}}">{{unit}}</a></td>
+                <td>
+                    {{unit.created_by.first_name}} {{unit.created_by.last_name}} ({{unit.created_by}})
+                </td>
+                <td>
+                    {{unit.created|to_jalali:'%Y/%m/%d'}}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>تاکنون واحدی ثبت نشده است.</h1>
+    {% endif %}    
+</div>
+{% endblock %}

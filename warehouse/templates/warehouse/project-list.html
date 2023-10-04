@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %} {% block content %}
+{% load jalali_tags %}
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    <a class="btn btn-primary" style="float: left;" href="{% url 'project_add' %}">+
+        ثبت پروژه جدید    
+        </a>
+    
+    {% if projects %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">ردیف</th>
+                <th scope="col">نام پروژه</th>
+                <th scope="col">شماره پروژه</th>
+                <th scope="col">ثبت شده توسط</th>
+                <th scope="col">تاریخ ثبت</th>
+    
+            </tr>
+        </thead>
+        <tbody>
+            {% for project in projects %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><a href="{{project.get_edit_url}}">{{project.name}}</a></td>
+                <td><a href="{{project.get_edit_url}}">{{project.number}}</a></td>
+                <td>
+                    {{project.created_by.first_name}} {{project.created_by.last_name}} ({{project.created_by}})
+                </td>
+                <td>
+                    {{project.created|to_jalali:'%Y/%m/%d'}}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>تاکنون پروژه ای ثبت نشده است.</h1>
+    {% endif %}    
+</div>
+{% endblock %}

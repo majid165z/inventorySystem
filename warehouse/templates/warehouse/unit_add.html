@@ -1,0 +1,36 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<form action="" method="POST"
+class="row flex justify-content-center align-content-center align-items-center">
+    {% csrf_token %}
+
+    <div class="col-12 col-md-6 row rounded bg-white p-5" >
+        {% if form.errors %}
+          {% for key,value in form.errors.items %} 
+            <p class="text-red">{{ value|escape }}</p>
+          {% endfor %}
+        {% endif %}
+        <div class="col-12 col-md-6">
+            <p class="pb-1 mb-1">{{ form.name.label_tag }}</p>
+            {{ form.name }}
+        </div>
+        <div class="col-12 col-md-6">
+            <p class="pb-1 mb-1">{{ form.abrv.label_tag }}</p>
+            {{ form.abrv }}
+        </div>
+        
+        <div class="col-12 mt-2">
+            <div class="row m-0 flex justify-content-center align-content-center align-items-center">
+                <button class="btn btn-primary w-25" type="submit" value="login">ثبت</button>
+            </div>
+            <input type="hidden" name="next" value="{{ next }}" />          
+        </div>
+    </div>
+
+
+
+</form>
+
+{% endblock content %}

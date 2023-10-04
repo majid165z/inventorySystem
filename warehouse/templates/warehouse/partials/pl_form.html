@@ -1,0 +1,76 @@
+{{ formset.management_form }}
+<hr class="mt-2">
+<h3 class="text-center">ثبت جزئیات بارنامه</h3>
+
+<div class="row p-0 m-0">
+    <div class="col-12 col-md-1">
+        <p class="pb-1 mb-1 text-center">{{ formset.empty_form.number.label_tag }}</p>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <p class="pb-1 mb-1 text-center">{{ formset.empty_form.item.label_tag }}</p>
+    </div>
+    <div class="col-12 col-md-3">
+        <p class="pb-1 mb-1 text-center">{{ formset.empty_form.unit.label_tag }}</p>
+    </div>
+    <div class="col-12 col-md-2">
+        <p class="pb-1 mb-1 text-center">{{ formset.empty_form.quantity.label_tag }}</p>
+    </div>
+
+</div>
+<div id="formset_container">  
+{% for forms in formset %}
+    <div class="row p-0 m-0 my-1">
+        {{forms.id}}
+        <div class="col-12 col-md-1 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.number.label_tag }}</p> -->
+            {{ forms.number }}
+            {{forms.number.errors}}
+        </div>
+
+        <div class="col-12 col-md-6 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.item.label_tag }}</p> -->
+            {{ forms.item }}
+            {{forms.item.errors}}
+        </div>
+        <div class="col-12 col-md-3 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+            {{ forms.unit }}
+            {{forms.unit.errors}}
+        </div>
+        <div class="col-12 col-md-2 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.quantity.label_tag }}</p> -->
+            {{ forms.quantity }}
+            {{forms.quantity.errors}}
+        </div>
+
+    </div>
+{% endfor %}
+</div>
+<div id="empty_form" hidden>
+    <div class="row p-0 m-0 my-1">
+        {{formset.empty_form.id}}
+        <div class="col-12 col-md-1 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.number.label_tag }}</p> -->
+            {{ formset.empty_form.number }}
+            {{formset.empty_form.number.errors}}
+        </div>
+
+        <div class="col-12 col-md-6 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.item.label_tag }}</p> -->
+            {{ formset.empty_form.item }}
+            {{formset.empty_form.item.errors}}
+        </div>
+        <div class="col-12 col-md-3 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+            {{ formset.empty_form.unit }}
+            {{formset.empty_form.unit.errors}}
+        </div>
+        <div class="col-12 col-md-2 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.quantity.label_tag }}</p> -->
+            {{ formset.empty_form.quantity }}
+            {{formset.empty_form.quantity.errors}}
+        </div>
+
+    </div>
+</div>

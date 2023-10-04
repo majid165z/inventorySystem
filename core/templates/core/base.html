@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="{% static 'core/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/main.css' %}">
+
+    {% block css %} {% endblock %}
+</head>
+<body dir="rtl" class="bg-main">
+
+    <!-- navbar -->
+    {% include 'core/navbar.html' %}
+    <!-- end of navbar -->
+    <!-- ------------------------------------------- -->
+    <!-- messages go here -->
+    
+    {% if messages %}
+    <div class="container-fluid">
+        <div class="col-12 col-md-10 rounded mx-auto">
+            {% for message in messages %}
+            <div class="alert alert-{{message.tags}}" role="alert">
+            {{message}}
+            <button type="button" class="btn-close" style="float: left;" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %} 
+        </div>
+    </div>
+    {% endif %}
+    <!-- end of messages -->
+    <!-- orginal content -->
+    <div class="container-fluid">
+        {% block content %} {% endblock %}
+    </div>
+    
+    <!-- end of orginal content -->
+    <!-- ------------------------------------------- -->
+    
+
+    <script src="{% static 'core/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'core/js/jquery.js' %}"></script>
+    <script src="{% static 'core/js/select2.full.min.js' %}"></script>
+    
+
+
+    <script>
+        $(document).ready(function(){
+            $('input[type=text],input[type=password],input[type=number],textarea').addClass('form-control');
+            $('select').addClass('form-select');
+            let users = $('#id_users')
+            if (users.length > 0) {
+                users.select2();
+            }
+
+        })
+    </script>
+    {% block js %} {% endblock %}
+</body>
+</html>

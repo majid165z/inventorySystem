@@ -1,0 +1,226 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<form action="" method="POST"
+class="row flex justify-content-center align-content-center align-items-center">
+    {% csrf_token %}
+
+    <div class="col-12 col-md-10 row rounded bg-white p-5" >
+        {% if form.errors %}
+          {% for key,value in form.errors.items %} 
+            <p class="text-red">{{ value|escape }}</p>
+          {% endfor %}
+        {% endif %}
+        <div class="col-12 col-md-4">
+            <p class="pb-1 mb-1 text-center">{{ form.project.label_tag }}</p>
+            {{ form.project }}
+        </div>
+        
+        <div class="col-12 col-md-4">
+            <p class="pb-1 mb-1 text-center">{{ form.number.label_tag }}</p>
+            {{ form.number }}
+        </div>
+        <div class="col-12 col-md-4">
+            <p class="pb-1 mb-1 text-center">{{ form.date.label_tag }}</p>
+            {{ form.date }}
+        </div>
+
+        {{ formset.management_form }}
+        <hr class="mt-2">
+        <h3 class="text-center">ثبت جزئیات درخواست</h3>
+
+        <div class="row p-0 m-0">
+            <div class="col-12 col-md-1">
+                <p class="pb-1 mb-1 text-center">{{ formset.empty_form.number.label_tag }}</p>
+            </div>
+
+            <div class="col-12 col-md-2">
+                <p class="pb-1 mb-1 text-center">{{ formset.empty_form.tag_number.label_tag }}</p>
+            </div>
+            <div class="col-12 col-md-5">
+                <p class="pb-1 mb-1 text-center">{{ formset.empty_form.item.label_tag }}</p>
+            </div>
+            <div class="col-12 col-md-2">
+                <p class="pb-1 mb-1 text-center">{{ formset.empty_form.unit.label_tag }}</p>
+            </div>
+            <div class="col-12 col-md-2">
+                <p class="pb-1 mb-1 text-center">{{ formset.empty_form.quantity.label_tag }}</p>
+            </div>
+
+        </div>
+        <div id="formset_container">  
+        {% for forms in formset %}
+            <div class="row p-0 m-0 my-1">
+                {{forms.id}}
+                <div class="col-12 col-md-1 p-1">
+                    <!-- <p class="pb-1 mb-1">{{ forms.number.label_tag }}</p> -->
+                    {{ forms.number }}
+                    {{forms.number.errors}}
+                </div>
+
+                <div class="col-12 col-md-2 p-1">
+                    <!-- <p class="pb-1 mb-1">{{ forms.tag_number.label_tag }}</p> -->
+                    {{ forms.tag_number }}
+                    {{forms.tag_number.errors}}
+                </div>
+                <div class="col-12 col-md-5 p-1">
+                    <!-- <p class="pb-1 mb-1">{{ forms.item.label_tag }}</p> -->
+                    {{ forms.item }}
+                    {{forms.item.errors}}
+                </div>
+                <div class="col-12 col-md-2 p-1">
+                    <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+                    {{ forms.unit }}
+                    {{forms.unit.errors}}
+                </div>
+                <div class="col-12 col-md-2 p-1">
+                    <!-- <p class="pb-1 mb-1">{{ forms.quantity.label_tag }}</p> -->
+                    {{ forms.quantity }}
+                    {{forms.quantity.errors}}
+                </div>
+
+            </div>
+        {% endfor %}
+        </div>    
+        <div class="col-12 mt-2">
+            <div class="row m-0 flex justify-content-center align-content-center align-items-center">
+                <button class="btn btn-primary w-25 mx-2" type="submit" value="login">ثبت</button>
+                <div class="btn btn-info w-25 mx-2" id='add-item'>اضافه کردن آیتم جدید</div>
+            </div>
+            <input type="hidden" name="next" value="{{ next }}" />          
+        </div>
+    </div>
+
+
+
+</form>
+
+
+{% endblock content %}
+
+
+
+{% block js %}
+{{form.media}}
+{{formset.media}}
+<script type="text/html" id="item-template"> 
+    <div class="row p-0 m-0 my-1">
+        {{formset.empty_form.id}}
+        <div class="col-12 col-md-1 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.number.label_tag }}</p> -->
+            {{ formset.empty_form.number }}
+        </div>
+
+        <div class="col-12 col-md-2 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.tag_number.label_tag }}</p> -->
+            {{ formset.empty_form.tag_number }}
+        </div>
+        <div class="col-12 col-md-5 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.item.label_tag }}</p> -->
+            {{ formset.empty_form.item }}
+        </div>
+        <div class="col-12 col-md-2 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+            {{ formset.empty_form.unit }}
+        </div>
+        <div class="col-12 col-md-2 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.quantity.label_tag }}</p> -->
+            {{ formset.empty_form.quantity }}
+        </div>
+
+    </div>
+</script>
+<script>
+    $(document).ready(function(){
+        $.noConflict()
+        let selectOpt = $("select[id$='-item']")
+
+        selectOpt.select2({
+            tags: true,
+            createTag: function (params) {
+                var term = $.trim(params.term);
+            
+                if (term === '') {
+                  return null;
+                }
+                return {
+                  id: term,
+                  text: term,
+                  newTag: true 
+                }
+              },
+        })
+
+        $('body').on('select2:select',function(e){
+            var data = e.params.data;
+            if(data.newTag){
+                $.ajax({
+                    url : "{% url 'create_item_name' %}",
+                    method : 'get',
+                    data : {name:data.text}
+                }).done(function(data){
+                    e.params.data.id = data.id
+                    var newdata = {
+                        id: data.id,
+                        text: e.params.data.text
+                    }
+                    
+                    let newOption = new Option(newdata.text, newdata.id, false, false);
+                    $("select[id$='-item']").append(newOption).trigger('change');
+                    $('#' + e.target.id).val(data.id)
+                    $("select[id$='-item']").trigger('change');
+
+                })
+            }
+        })
+        $(".select2-container").addClass("w-100")
+        $(".select2-selection__rendered").addClass('form-control py-1')
+        $('.select2-selection').addClass('border-0')
+
+        let addBtn = $('#add-item')
+        let formContainer = document.querySelector('#formset_container')
+        let total_el = document.querySelector('#id_items-TOTAL_FORMS')
+        addBtn.on('click',function(){
+            let count = total_el.getAttribute('value')
+            let tmplMarkup = $('#item-template').html();
+            let compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+            formContainer.insertAdjacentHTML('beforeend', compiledTmpl);
+            total_el.setAttribute('value',count+1)
+            $('input[type=text],input[type=password],input[type=number],textarea').addClass('form-control');
+            $('select').addClass('form-select');
+            let selectOpt = $("select[id$='-item']")
+
+            selectOpt.select2({
+                tags: true,
+                createTag: function (params) {
+                    var term = $.trim(params.term);
+                
+                    if (term === '') {
+                      return null;
+                    }
+                    return {
+                      id: term,
+                      text: term,
+                      newTag: true 
+                    }
+                  },
+            })
+            $(".select2-container").addClass("w-100")
+            $(".select2-selection__rendered").addClass('form-control py-1')
+            $('.select2-selection').addClass('border-0')
+    
+    
+
+
+
+
+        })
+        
+    })
+
+        
+
+
+</script>
+{% endblock js %}

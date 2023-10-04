@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %} {% block content %}
+{% load jalali_tags %}
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    <a class="btn btn-primary" style="float: left;" href="{% url 'pl_add' %}">+
+        ثبت بارنامه جدید    
+        </a>
+    
+    {% if pls %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">ردیف</th>
+                <th scope="col">شماره بارنامه</th>
+                <th scope="col">پروژه</th>
+                <th scope="col">MR</th>
+                <th scope="col">سفارش خرید</th>
+                <th scope="col">ثبت شده توسط</th>
+                <th scope="col">تاریخ بارنامه</th>
+                <th scope="col">تاریخ ثبت</th>
+    
+            </tr>
+        </thead>
+        <tbody>
+            {% for pl in pls %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><a href="{{pl.get_edit_url}}">{{pl.number}}</a></td>
+                <td>{{pl.project}}</td>
+                <td>{{pl.mr}}</td>
+                <td>{{pl.po}}</td>
+                <td>
+                    {{pl.created_by.first_name}} {{pl.created_by.last_name}} ({{pl.created_by}})
+                </td>
+                <td>
+                    {{pl.date|to_jalali:'%Y/%m/%d'}}
+                </td>
+                <td>
+                    {{pl.created|to_jalali:'%Y/%m/%d'}}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>تاکنون بارنامه ای ثبت نشده است.</h1>
+    {% endif %}    
+</div>
+{% endblock %}

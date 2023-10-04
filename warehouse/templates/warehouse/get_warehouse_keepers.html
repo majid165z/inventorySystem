@@ -1,0 +1,28 @@
+{% if users %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">ردیف</th>
+            <th scope="col">نام انباردار</th>
+            <th scope="col">نام خانوادگی انباردار</th>
+            <th scope="col">نام کاربری</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <th scope="row">{{forloop.counter}}</th>
+            <td><a href="{{user.get_edit_url}}">{{user.first_name}}</a></td>
+            <td>
+                {{user.last_name}}
+            </td>
+            <td>
+                {{user.username}}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<h1>تاکنون انبارداری برای این انبار ثبت نشده است.</h1>
+{% endif %}    

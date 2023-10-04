@@ -1,0 +1,82 @@
+{% extends 'core/base.html' %} {% block content %}
+
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    <a class="btn btn-primary" style="float: left;" href="{% url 'warehouse_add' %}">+ ثبت انبار جدید</a>
+    {% if warehouses %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">ردیف</th>
+                <th scope="col">نام انبار</th>
+                <th scope="col">آدرس انبار</th>
+                <th scope="col">کالاها</th>
+                <th scope="col">انباردارها</th>
+    
+            </tr>
+        </thead>
+        <tbody>
+            {% for warehouse in warehouses %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><a href="{{warehouse.get_edit_url}}">{{warehouse.name}}</a></td>
+                <td>
+                    {{warehouse.address}}
+                </td>
+                <td>
+                    <button>مشاهده کالاهای در انبار</button>
+                </td>
+                <td>
+                    <button class="btn btn-info"
+                    data-bs-toggle="modal" data-bs-target="#warehouseKeeperModal"
+                    data-bs-id = "{{warehouse.id}}"
+                    >مشاهده انبارداران</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>تاکنون انباری ثبت نشده است.</h1>
+    {% endif %}    
+</div>
+
+
+<!-- Modal for warehouse keepers -->
+<div class="modal fade" id="warehouseKeeperModal" tabindex="-1" aria-labelledby="warehouseKeeperModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="warehouseKeeperModalLabel">فهرست انبارداران</h1>
+          <button type="button" class="btn-close m-0 p-0" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="warehousekeeper_id">
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block js %}
+<script>
+    const warehouseKeeperModal = document.getElementById('warehouseKeeperModal')
+if (warehouseKeeperModal) {
+    warehouseKeeperModal.addEventListener('show.bs.modal', event => {
+    // Button that triggered the modal
+    const button = event.relatedTarget
+    // Extract info from data-bs-* attributes
+    const id = button.getAttribute('data-bs-id')
+    const modalContent = document.getElementById("warehousekeeper_id")
+
+    $.ajax({
+        method : 'get',
+        url : '{% url "get_warehouse_keepers" %}',
+        data : {id:id}
+    }).done (function (data) {
+        modalContent.innerHTML = data
+    })
+  })
+}
+</script>
+{% endblock %}

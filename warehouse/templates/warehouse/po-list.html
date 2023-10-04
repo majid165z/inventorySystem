@@ -1,0 +1,45 @@
+{% extends 'core/base.html' %} {% block content %}
+{% load jalali_tags %}
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    <a class="btn btn-primary" style="float: left;" href="{% url 'po_add' %}">+
+        ثبت سفارش خرید جدید    
+        </a>
+    
+    {% if pos %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">ردیف</th>
+                <th scope="col">شماره خرید</th>
+                <th scope="col">پروژه</th>
+                <th scope="col">ثبت شده توسط</th>
+                <th scope="col">تاریخ خرید</th>
+                <th scope="col">تاریخ ثبت</th>
+    
+            </tr>
+        </thead>
+        <tbody>
+            {% for po in pos %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><a href="{{po.get_edit_url}}">{{po.number}}</a></td>
+                <td>{{po.project}}</td>
+                <td>
+                    {{po.created_by.first_name}} {{po.created_by.last_name}} ({{po.created_by}})
+                </td>
+                <td>
+                    {{po.date|to_jalali:'%Y/%m/%d'}}
+                </td>
+                <td>
+                    {{po.created|to_jalali:'%Y/%m/%d'}}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>تاکنون سفارشی ثبت نشده است.</h1>
+    {% endif %}    
+</div>
+{% endblock %}

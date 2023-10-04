@@ -1,0 +1,202 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<form action="" method="POST" id="myForm"
+class="row flex justify-content-center align-content-center align-items-center">
+    {% csrf_token %}
+
+    <div class="col-12 col-md-10 row rounded bg-white p-5" >
+        {% if form.errors %}
+          {% for key,value in form.errors.items %} 
+            <p class="text-red">{{ value|escape }}</p>
+          {% endfor %}
+        {% endif %}
+        <div class="col-12 col-md-4">
+            <p class="pb-1 mb-1 text-center">{{ form.project.label_tag }}</p>
+            {{ form.project }}
+        </div>
+        <div class="col-12 col-md-4">
+            <p class="pb-1 mb-1 text-center">{{ form.mr.label_tag }}</p>
+            {{ form.mr }}
+        </div>
+        <div class="col-12 col-md-4">
+            <p class="pb-1 mb-1 text-center">{{ form.po.label_tag }}</p>
+            {{ form.po }}
+        </div>
+        
+        <div class="col-12 col-md-4">
+            <p class="pb-1 mb-1 text-center">{{ form.number.label_tag }}</p>
+            {{ form.number }}
+        </div>
+        <div class="col-12 col-md-4">
+            <p class="pb-1 mb-1 text-center">{{ form.date.label_tag }}</p>
+            {{ form.date }}
+        </div>
+        <div class="row m-0 p-0 py-3 my-3" id="warning" {% if formset %} hidden {% endif %}>
+            <h3 class="my-2 text-center">جهت ثبت اقلام بارنامه ابتدا یک سفارش خرید کالا انتخاب نمایید.</h3>
+        </div>
+        <div id="formset" class="my-3">
+            {% if formset %}
+                {% include 'warehouse/partials/pl_form.html' %}
+            {% endif %}
+        </div>
+
+
+
+        <div class="col-12 mt-2">
+            <div class="row m-0 flex justify-content-center align-content-center align-items-center">
+                <button class="btn btn-primary w-25 mx-2" type="submit">ثبت</button>
+                <div class="btn btn-info w-25 mx-2" id='add-item' disabled>اضافه کردن آیتم جدید</div>
+            </div>
+            <input type="hidden" name="next" value="{{ next }}" />          
+        </div>
+    </div>
+
+
+
+</form>
+
+
+{% endblock content %}
+
+
+
+{% block js %}
+{{form.media}}
+
+<script>
+
+    $(document).ready(function(){
+        {% if pl %}
+        $('#id_mr,#id_po,#id_project').prop('disabled', true);
+        $("select[id$='-item']").prop('disabled',true)
+        $("select[id$='-unit']").prop('disabled',true)
+
+        {% else %}
+        $('#id_mr,#id_po').prop('disabled', true);
+        {% endif %}
+
+        let addBtn = $('#add-item')
+        addBtn.on('click',function(){
+            let formContainer = document.querySelector('#formset_container')
+            let total_el = document.querySelector('#id_items-TOTAL_FORMS')
+            let count = total_el.getAttribute('value')
+            let empty_from = $('#empty_form').html();
+            let compiledTmpl = empty_from.replace(/__prefix__/g, count);
+            formContainer.insertAdjacentHTML('beforeend', compiledTmpl);
+            total_el.setAttribute('value',count+1)
+            $('input[type=text],input[type=password],input[type=number],textarea').addClass('form-control');
+            $('select').addClass('form-select')
+        })
+        let project_select = document.getElementById("id_project")
+        project_select.addEventListener('change',function(event){
+            let project_id = this.value
+            if (project_id){
+                    $.ajax(
+                    {
+                    url : '{% url "get_project_mr" %}',
+                    method: 'get',
+                    data :{id:project_id}
+                    }
+                ).done( function (data) {
+                    document.getElementById("id_mr").innerHTML = data
+                    $('#id_mr').prop('disabled', false);
+                })
+            } else {
+                $('#id_mr').val("")
+                document.querySelector("#id_mr").dispatchEvent(new Event("change"))
+                $('#id_mr').prop('disabled', true);
+            }
+        })
+
+        //re-enabling the select mr field to get submitted
+        $('#myForm').on('submit', function() {
+            $('select').prop('disabled', false)
+
+        });
+
+        let mr_select = document.getElementById("id_mr")
+        mr_select.addEventListener('change',function(event){
+            let mr_id = this.value
+            if (mr_id){    
+                $.ajax(
+                    {
+                    url : '{% url "get_po_list" %}',
+                    method: 'get',
+                    data :{id:mr_id}
+                    }
+                ).done( function (data) {
+                    let poSelect = document.getElementById("id_po")
+                    poSelect.innerHTML = ""
+                    items = data.items
+                    $('#id_po').append(
+                        '<option value selected>---------</option>'
+                    )
+                    $.each(items,function(i,p){
+                        $('#id_po').append($('<option></option>').val(p[0]).html(p[1]))
+                    })
+                    $('#id_po').prop('disabled', false)
+                })
+            } else {
+                $('#id_po').val("")
+                document.querySelector("#id_po").dispatchEvent(new Event("change"))
+                $('#id_po').prop('disabled', true);
+
+            }
+        })
+        let po_select = document.getElementById("id_po")
+        po_select.addEventListener('change',function(event){
+            let po_id = this.value
+            if (po_id){
+                $("#warning").hide()   
+                addBtn.prop("disabled",false) 
+                $.ajax(
+                    {
+                    url : '{% url "get_pl_formset" %}',
+                    method: 'get',
+                    data :{po_id:po_id}
+                    }
+                ).done( function (data) {
+                    $("#formset").html(data)
+                    $('#add-item').prop('disabled', false)
+                    $('input[type=text],input[type=password],input[type=number],textarea').addClass('form-control');
+                    $('select').addClass('form-select');
+                    $("select[id$='-item']").prop('disabled',true)
+                    $("select[id$='-unit']").prop('disabled',true)
+
+                })
+                        
+            } else {
+                $("#warning").show() 
+                $("#formset").html("")
+                addBtn.prop("disabled",true)
+            }
+        })
+        // list to the change of formset number field
+        document.addEventListener("change",function(event){
+            let ev_id = event.target.id
+            if (ev_id && ev_id.includes("-number")){
+                let mr_item_id = event.target.value
+                $.ajax({
+                    url : '{% url "get_item_desc" %}',
+                    method : 'get',
+                    data : {id:mr_item_id}
+                }).done(function(data){
+                    let decs_id = ev_id.replace("-number","-item")
+                    $("#"+decs_id).val(data.name).change()
+                    let unit_id = ev_id.replace("-number","-unit")
+                    $("#"+unit_id).val(data.unit).change()
+                })
+            }
+        })
+        
+    // ---------------
+    // end of document get ready
+    })
+
+        
+
+
+</script>
+{% endblock js %}
