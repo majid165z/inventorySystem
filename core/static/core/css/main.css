@@ -1,33 +1,6 @@
-@font-face {
-    font-family: 'B Nazanin';
-    src: local('B Nazanin'), 
-        local('BNazanin'),
-        url('/static/core/fonts/BNazanin.woff2') format('woff2'), 
-        url('/static/core/fonts/BNazanin.woff') format('woff'), 
-        url('/static/core/fonts/BNazanin.ttf') format('truetype');
-    font-weight: 600;
-    font-stretch: normal;
-    /*font-style: normal;*/
+*:not(i){
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
-
-@font-face {
-    font-family: 'B Nazanin';
-    src: local('B Nazanin Bold'), 
-        local('BNazanin-Bold'),
-        url('/static/core/fonts/BNaznnBd.woff2') format('woff2'), 
-        url('/static/core/fonts/BNaznnBd.woff') format('woff'), 
-        url('/static/core/fonts/BNaznnBd.ttf') format('truetype');
-    font-weight: 800;
-    font-stretch: normal;
-    /*font-style: normal;*/
-}
-
-
-*:not(i) {
-    font-family: 'B Nazanin';
-}
-
-
 .bg-main{
     background-color: rgb(245, 245, 245);
 }

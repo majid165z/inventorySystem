@@ -1,16 +1,16 @@
 {% extends 'core/base.html' %} {% block content %}
 
 <div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
-    <a class="btn btn-primary" style="float: left;" href="{% url 'create_user' %}">+ ثبت کاربر جدید</a>
+    <a class="btn btn-primary" style="float: right;" href="{% url 'create_user' %}">+ Create User</a>
 
     <table class="table table-striped">
         <thead>
             <tr>
-                <th scope="col">ردیف</th>
-                <th scope="col">نام کاربری</th>
-                <th scope="col">انباردار</th>
-                <th scope="col">بخش فنی (متقاضی)</th>
-                <th scope="col">مدیر</th>
+                <th scope="col">#</th>
+                <th scope="col">Username</th>
+                <th scope="col">warehouse keeper</th>
+                <th scope="col">Technical Section</th>
+                <th scope="col">Admin</th>
     
             </tr>
         </thead>

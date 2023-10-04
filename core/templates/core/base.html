@@ -4,14 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}}</title>
+    <title>
+        Inventory System
+        {{title}}
+    </title>
     <link rel="stylesheet" href="{% static 'core/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'core/css/select2.min.css' %}">
     <link rel="stylesheet" href="{% static 'core/css/main.css' %}">
 
     {% block css %} {% endblock %}
 </head>
-<body dir="rtl" class="bg-main">
+<body  class="bg-main">
 
     <!-- navbar -->
     {% include 'core/navbar.html' %}
@@ -25,7 +28,7 @@
             {% for message in messages %}
             <div class="alert alert-{{message.tags}}" role="alert">
             {{message}}
-            <button type="button" class="btn-close" style="float: left;" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" style="float: right;" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {% endfor %} 
         </div>

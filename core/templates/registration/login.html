@@ -14,11 +14,11 @@ class="row flex justify-content-center align-content-center align-items-center">
 
         {% if next %} {% if user.is_authenticated %}
         <p>
-        شما دسترسی لازم برای مشاهده صفحه مورد نظر را ندارید.
+            You don't have the required permission
         </p>
         {% else %}
         <p>
-            لطفا برای مشاهده صفحه مورد نظر وارد شوید
+            please login to see the requsted page.
         </p>
         {% endif %} {% endif %}
         <div class="col-12">
@@ -31,7 +31,7 @@ class="row flex justify-content-center align-content-center align-items-center">
         </div>
         <div class="col-12 mt-2">
             <div class="row m-0 flex justify-content-center align-content-center align-items-center">
-                <button class="btn btn-primary w-25" type="submit" value="login">ورود</button>
+                <button class="btn btn-primary w-25" type="submit" value="login">Login</button>
             </div>
             <input type="hidden" name="next" value="{{ next }}" />          
         </div>

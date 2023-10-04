@@ -17,7 +17,7 @@ PackingList
 def warehouse_list(request:HttpRequest):
     user = request.user
     if not user.is_superuser:
-        msg = 'شما دسترسی لازم برای مشاهده این صفحه را ندارید'
+        msg = "You don't have the required permission."
         messages.error(request,msg)
         return redirect('home')
     warehouses = Warehouse.objects.all()
@@ -34,12 +34,13 @@ def warehouse_add(request:HttpRequest):
         obj.created_by = user
         obj.save()
         form.save_m2m()
-        msg = 'انبار با موفقیت قبت شد.'
+        msg = 'The warehouse was created successfully.'
         messages.success(request,msg)
         return redirect('warehouse_list')
     context = {
         'form':form,
-        'user':user
+        'user':user,
+        'title':"Create Warehouse"
     }
     return render(request,'warehouse/warehouse_add.html',context)
 
@@ -47,19 +48,20 @@ def warehouse_add(request:HttpRequest):
 def warehouse_edit(request:HttpRequest,id):
     user = request.user
     if not user.is_superuser:
-        msg = 'شما دسترسی لازم برای اصلاح کاربر را ندارید'
+        msg = "You don't have the required permission."
         messages.error(request,msg)
         return redirect('warehouse_list')
     warehouse = Warehouse.objects.get(id=id)
     form = WarehouseForm(request.POST or None,instance=warehouse)
     if request.method == 'POST' and form.is_valid():
         obj = form.save()
-        msg = 'انبار با موفقیت اصلاح شد.'
+        msg = "The warehouse was edited successfully."
         messages.success(request,msg)
         return redirect('warehouse_list')
     context = {
         'form':form,
-        'user':user
+        'user':user,
+        "title":"Edit Warehouse"
     }
     return render(request,'warehouse/warehouse_add.html',context)
 
@@ -74,7 +76,7 @@ def get_warehouse_keepers(request:HttpRequest):
 @login_required
 def unit_list(request:HttpRequest):
     units = Unit.objects.all()
-    context = {'title':'واحد ها',
+    context = {'title':'Units',
     'units':units
     }
     return render(request,'warehouse/unit_list.html',context)
@@ -83,7 +85,7 @@ def unit_list(request:HttpRequest):
 def unit_add(request:HttpRequest):
     user = request.user
     if not user.is_superuser:
-        msg = 'شما دسترسی لازم برای ثبت واحد را ندارید.'
+        msg = "You don't have the required permission."
         messages.error(request,msg)
         return redirect('unit_list')
     form = UnitForm(request.POST or None)
@@ -91,11 +93,11 @@ def unit_add(request:HttpRequest):
         obj = form.save(commit=False)
         obj.created_by = user
         obj.save()
-        msg = 'واحد مدنظر با موفقیت ثبت شد.'
+        msg = "The Unit was created successfully."
         messages.success(request,msg)
         return redirect('unit_list')
     context = {
-        'title': 'ثبت واحد جدید',
+        'title': "Create Unit",
         'form' : form
     }
     return render(request,'warehouse/unit_add.html',context)
@@ -104,18 +106,18 @@ def unit_add(request:HttpRequest):
 def unit_edit(request:HttpRequest,id):
     user = request.user
     if not user.is_superuser:
-        msg = 'شما دسترسی لازم برای اصلاح واحد را ندارید.'
+        msg = "You don't have the required permission."
         messages.error(request,msg)
         return redirect('unit_list')
     instance = Unit.objects.get(id=id)
     form = UnitForm(request.POST or None,instance=instance)
     if form.is_valid():
         obj = form.save()
-        msg = 'واحد مدنظر با اصلاح شد.'
+        msg = "The unit was edited successfully."
         messages.success(request,msg)
         return redirect('unit_list')
     context = {
-        'title': 'اصلاح واحد',
+        'title': "Edit Unit",
         'form' : form
     }
     return render(request,'warehouse/unit_add.html',context)
@@ -124,7 +126,7 @@ def unit_edit(request:HttpRequest,id):
 def project_list(request:HttpRequest):
     projects = Project.objects.all()
     context = {
-        'title':'فهرست پروژه ها',
+        'title':'Projects List',
         'projects':projects
     }
     return render(request,'warehouse/project-list.html',context)
@@ -133,7 +135,7 @@ def project_list(request:HttpRequest):
 def project_add(request:HttpRequest):
     user = request.user
     if not user.is_superuser:
-        msg = 'شما دسترسی لازم برای ثبت پروژه را ندارید.'
+        msg = "You don't have the required permission."
         messages.error(request,msg)
         return redirect('project_list')
     form = ProjectForm(request.POST or None)
@@ -141,11 +143,11 @@ def project_add(request:HttpRequest):
         obj = form.save(commit=False)
         obj.created_by = user
         obj.save()
-        msg = 'پروژه مدنظر با موفقیت ثبت شد.'
+        msg = "The Project was created successfully."
         messages.success(request,msg)
         return redirect('project_list')
     context = {
-        'title': 'ثبت پروژه جدید',
+        'title': 'Create Project',
         'form' : form
     }
     return render(request,'warehouse/project_add.html',context)
@@ -154,18 +156,18 @@ def project_add(request:HttpRequest):
 def project_edit(request:HttpRequest,id):
     user = request.user
     if not user.is_superuser:
-        msg = 'شما دسترسی لازم برای اصلاح پروژه را ندارید.'
+        msg = "You don't have the required permission."
         messages.error(request,msg)
         return redirect('project_list')
     project = Project.objects.get(id=id)
     form = ProjectForm(request.POST or None,instance=project)
     if form.is_valid():
         obj = form.save()
-        msg = 'پروژه مدنظر با موفقیت اصلاح شد.'
+        msg = 'The Project was edited successfully.'
         messages.success(request,msg)
         return redirect('project_list')
     context = {
-        'title': 'اصلاح پروژه',
+        'title': 'Edit Project',
         'form' : form
     }
     return render(request,'warehouse/project_add.html',context)
@@ -174,7 +176,7 @@ def project_edit(request:HttpRequest,id):
 def mr_list(request:HttpRequest):
     mrs = MaterialRequisition.objects.all()
     context = {
-        'title':'فهرست درخواست های کالا',
+        'title':'MR List',
         'mrs':mrs
     }
     return render(request,'warehouse/mr-list.html',context)
@@ -191,13 +193,13 @@ def mr_add(request:HttpRequest):
             obj.created_by = user
             obj.save()
             inline_form.save()
-            msg = 'درخواست کالا )MR) با موفقت ثبت شد.'
+            msg = 'MR was Created successfully.'
             messages.success(request,msg)
             return redirect('mr_list')
         
     
     context = {
-        'title': 'ثبت درخواست کالا جدید',
+        'title': 'Create MR',
         'form':form,
         'formset':inline_form or MrItemFromSet(request.POST or None)
     }
@@ -214,13 +216,13 @@ def mr_edit(request:HttpRequest,id):
         inline_form = MrItemFromSet(request.POST,instance=obj)
         if inline_form.is_valid():
             inline_form.save()
-            msg = 'درخواست کالا )MR) با موفقت اصلاح شد.'
+            msg = 'MR was edited successfully.'
             messages.success(request,msg)
             return redirect('mr_list')
         
     
     context = {
-        'title': 'اصلاج درخواست کالا',
+        'title': 'Edit MR',
         'form':form,
         'formset':inline_form or MrItemFromSet(request.POST or None,instance=mr)
     }
@@ -230,7 +232,7 @@ def mr_edit(request:HttpRequest,id):
 def po_list(request:HttpRequest):
     pos = ProcurementOrder.objects.all()
     context = {
-        'title':'فهرست سفارشات خرید',
+        'title':'PO List',
         'pos':pos
     }
     return render(request,'warehouse/po-list.html',context)
@@ -248,12 +250,12 @@ def po_add(request:HttpRequest):
             obj.created_by = user
             obj.save()
             inline_form.save()
-            msg = 'سفارش خرید کالا با موفقت ثبت شد.'
+            msg = 'PO was created successfully.'
             messages.success(request,msg)
             return redirect('po_list')
     
     context = {
-        'title': 'ثبت سفارش خرید کالا',
+        'title': 'Create PO',
         'form':form,
         'formset':inline_form,
         'items':items
@@ -271,7 +273,7 @@ def po_edit(request:HttpRequest,id):
         inline_form = POItemFromSet(request.POST,instance=po,form_kwargs={'mr':po.mr})
         if inline_form.is_valid():
             inline_form.save()
-            msg = 'سفارش خرید کالا با موفقیت اصلاح شد.'
+            msg = 'PO was edited successfully.'
             messages.success(request,msg)
             return redirect('po_list')
         else:
@@ -286,7 +288,7 @@ def po_edit(request:HttpRequest,id):
         formset.extra = 0
 
     context = {
-        'title': 'اصلاح سفارش خرید کالا',
+        'title': 'Edit PO',
         'form':form,
         'formset':formset,
         'po':po
@@ -297,7 +299,7 @@ def po_edit(request:HttpRequest,id):
 def pl_list(request:HttpRequest):
     pls = PackingList.objects.all()
     context = {
-        'title':'فهرست بارنامه ها',
+        'title':'Packing List',
         'pls':pls
     }
     return render(request,'warehouse/pl-list.html',context)
@@ -314,12 +316,12 @@ def pl_add(request:HttpRequest):
             obj.created_by = user
             obj.save()
             inline_form.save()
-            msg = '  بارنامه با موفقت ثبت شد.'
+            msg = 'Packing List was created successfully.'
             messages.success(request,msg)
             return redirect('pl_list')
     
     context = {
-        'title': 'ثبت بارنامه جدید',
+        'title': 'Create Packing List',
         'form':form,
         'formset':inline_form
     }
@@ -336,7 +338,7 @@ def pl_edit(request:HttpRequest,id):
         inline_form = PLItemFromSet(request.POST,instance=pl,form_kwargs={"po":pl.po})
         if inline_form.is_valid():
             inline_form.save()
-            msg = 'بارنامه با موفقیت اصلاح شد.'
+            msg = 'Packing List was created successfully.'
             messages.success(request,msg)
             return redirect('pl_list')
         else:
@@ -351,7 +353,7 @@ def pl_edit(request:HttpRequest,id):
         formset.extra = 0
 
     context = {
-        'title': 'اصلاح بارنامه',
+        'title': 'Edit Packing List',
         'form':form,
         'formset':formset,
         'pl':pl,

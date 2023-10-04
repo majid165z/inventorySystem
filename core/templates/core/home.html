@@ -15,7 +15,7 @@
 .main-timeline8 .timeline:nth-child(2n) .timeline-icon{right:auto;left:-14.5px}
 .main-timeline8 .timeline:nth-child(2n) .year{border-radius:50px 0 0 50px;background:#7eda99}
 .main-timeline8 .timeline:nth-child(2n) .year:before{border-left:none;border-right:35px solid transparent;left:auto;right:0}
-.main-timeline8 .timeline:nth-child(2n) .timeline-content{text-align:right;margin:0 35px 0 45px}
+.main-timeline8 .timeline:nth-child(2n) .timeline-content{text-align:initial;margin:0 35px 0 45px}
 .main-timeline8 .timeline:nth-child(2){margin-top:170px}
 .main-timeline8 .timeline:nth-child(odd){margin:-175px 0 0}
 .main-timeline8 .timeline:nth-child(even){margin-bottom:80px}
@@ -46,23 +46,29 @@ a {
 {% endblock css %}
 {% block content %}
 <div class="container">
-    <h4 class="text-center">به سامانه انبارداری شرکت مارون مناطق خوش آمدید.</h4>
+    <h4 class="text-center">
+        Welcome to Maroon Manategh Inventory System
+    </h4>
     <div class="row">
         <div class="col-md-12">
             <div class="main-timeline8">
                 <div class="timeline">
                     <span class="timeline-icon"></span>
-                    <span class="year">انبار</span>
+                    <span class="year">Warehouses</span>
                     <div class="timeline-content">
                         <p class="description">
-                            در این بخش از سامانه می توانید نسبت به تغذیه انبار ها و افراد انباردار اقدام نمایید.
-                           <br>
-                            <b> لینک های قابل دسترسی در این بخش شامل :</b>
+                            In this Section you can add warehouses and warehouse keepers to the selected warehouse.
+                            Also you can add Units of measurements (the Units are required to fill the subsequent forms)
+
+                            <br>
+                            <b>
+                                Main links for this section are as follow:
+                            </b>
                            <ul class="list-group list-group-flush">
-                               <li class="list-group-item"><a  href="{% url 'warehouse_list' %}">فهرست انبارها</a></li>
-                               <li class="list-group-item"><a  href="{% url 'warehouse_add' %}">ثبت انبار جدید</a></li>
-                               <li class="list-group-item"><a  href="{% url 'unit_list' %}">فهرست یکاهای ثبت شده</a></li>
-                               <li class="list-group-item"><a  href="{% url 'unit_add' %}">ثبت یکا (واحد) جدید</a></li>
+                               <li class="list-group-item"><a  href="{% url 'warehouse_list' %}">List of Warehouses</a></li>
+                               <li class="list-group-item"><a  href="{% url 'warehouse_add' %}">create a new Warehouse</a></li>
+                               <li class="list-group-item"><a  href="{% url 'unit_list' %}">List of Units</a></li>
+                               <li class="list-group-item"><a  href="{% url 'unit_add' %}">Create a new Unit </a></li>
 
 
                            </ul>
@@ -71,30 +77,30 @@ a {
                 </div>
                 <div class="timeline">
                     <span class="timeline-icon"></span>
-                    <span class="year">درخواست کالای اولیه (MR)</span>
+                    <span class="year">Material Requisition (MR)</span>
                     <div class="timeline-content">
                         <p class="description">
-                            این بخش از سامانه جهت ثبت درخواست های اولیه کالا و مشاهده فهرست این درخواست ها می باشد.
+                            In this Section you as a user can add MR and also see and edit all the MRs registred by the authorized users.
                             <br>
-                            <b> لینک های قابل دسترسی در این بخش شامل :</b>
+                            <b>The main links are as follow:</b>
                            <ul class="list-group list-group-flush">
-                               <li class="list-group-item"><a  href="{% url 'mr_list' %}">فهرست درخواست های اولیه</a></li>
-                               <li class="list-group-item"><a  href="{% url 'mr_add' %}">ثبت درخواست اولیه کالا </a></li>
+                               <li class="list-group-item"><a  href="{% url 'mr_list' %}">List of MRs</a></li>
+                               <li class="list-group-item"><a  href="{% url 'mr_add' %}">Create a new MR </a></li>
                            </ul>
                         </p>
                     </div>
                 </div>
                 <div class="timeline">
                     <span class="timeline-icon"></span>
-                    <span class="year">سفارشات کالا</span>
+                    <span class="year">Procurement Orders (PO)</span>
                     <div class="timeline-content">
                         <p class="description">
-                            این بخش سامانه جهت تنظیم سفارشات کالا ها و مشاهده سفارش های تنظیم شده می باشد.
+                            In this section you as an authorized user can register new POs and also see list of all submited POs.
                             <br>
-                            <b> لینک های قابل دسترسی در این بخش شامل :</b>
+                            <b>The main links are as follow:</b>
                            <ul class="list-group list-group-flush">
-                               <li class="list-group-item"><a  href="{% url 'po_list' %}">فهرست سفارشات کالا</a></li>
-                               <li class="list-group-item"><a  href="{% url 'po_add' %}">ثبت سفارش کالا </a></li>
+                               <li class="list-group-item"><a  href="{% url 'po_list' %}">List of POs</a></li>
+                               <li class="list-group-item"><a  href="{% url 'po_add' %}">Create a new PO </a></li>
                            </ul>
 
                         </p>
@@ -102,14 +108,16 @@ a {
                 </div>
                 <div class="timeline">
                     <span class="timeline-icon"></span>
-                    <span class="year">بارنامه ها</span>
+                    <span class="year">Packing Lists</span>
                     <div class="timeline-content">
                         <p class="description">
-                            در این قسمت از سامانه کاربران می توانند نسبت به تغذیه بارنامه ها و مشاهده و اصلاح بارنامه های ثبت شده اقدام نمایند.
+                            In this section Packing lists are created and edited.
+
                             <br>
+                            <b>The main links are as follow:</b>
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item"><a  href="{% url 'pl_list' %}">فهرست بارنامه ها</a></li>
-                                <li  class="list-group-item"><a  href="{% url 'pl_add' %}">ثبت بارنامه جدید </a></li>
+                                <li class="list-group-item"><a  href="{% url 'pl_list' %}">List of Packing Lists </a></li>
+                                <li  class="list-group-item"><a  href="{% url 'pl_add' %}">Create a new Packing List </a></li>
                              </ul>
 
                         </p>

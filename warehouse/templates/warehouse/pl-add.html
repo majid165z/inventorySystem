@@ -34,7 +34,9 @@ class="row flex justify-content-center align-content-center align-items-center">
             {{ form.date }}
         </div>
         <div class="row m-0 p-0 py-3 my-3" id="warning" {% if formset %} hidden {% endif %}>
-            <h3 class="my-2 text-center">جهت ثبت اقلام بارنامه ابتدا یک سفارش خرید کالا انتخاب نمایید.</h3>
+            <h3 class="my-2 text-center">
+                In order to submit the detials you must select a PO number.
+            </h3>
         </div>
         <div id="formset" class="my-3">
             {% if formset %}
@@ -46,8 +48,8 @@ class="row flex justify-content-center align-content-center align-items-center">
 
         <div class="col-12 mt-2">
             <div class="row m-0 flex justify-content-center align-content-center align-items-center">
-                <button class="btn btn-primary w-25 mx-2" type="submit">ثبت</button>
-                <div class="btn btn-info w-25 mx-2" id='add-item' disabled>اضافه کردن آیتم جدید</div>
+                <button class="btn btn-primary w-25 mx-2" type="submit">submit</button>
+                <div class="btn btn-info w-25 mx-2" id='add-item' disabled>Add more</div>
             </div>
             <input type="hidden" name="next" value="{{ next }}" />          
         </div>

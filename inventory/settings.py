@@ -139,6 +139,6 @@ MEDIA_URL = '/media/'
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
-LANGUAGE_CODE = 'fa'
+# LANGUAGE_CODE = 'fa'
 AUTH_USER_MODEL = 'core.user'
 MESSAGE_TAGS = {message_constants.ERROR: "danger"}

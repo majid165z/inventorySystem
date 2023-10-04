@@ -1,18 +1,18 @@
 {% extends 'core/base.html' %} {% block content %}
 {% load jalali_tags %}
 <div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
-    <a class="btn btn-primary" style="float: left;" href="{% url 'unit_add' %}">+
-    ثبت یکا (واحد) جدید    
+    <a class="btn btn-primary" style="float: right;" href="{% url 'unit_add' %}">+
+        Create Unit
     </a>
 
     {% if units %}
     <table class="table table-striped">
         <thead>
             <tr>
-                <th scope="col">ردیف</th>
-                <th scope="col">نام واحد</th>
-                <th scope="col">ثبت شده توسط</th>
-                <th scope="col">تاریخ ثبت</th>
+                <th scope="col">#</th>
+                <th scope="col">Unit Name</th>
+                <th scope="col">Created By</th>
+                <th scope="col">Date Submited</th>
     
             </tr>
         </thead>
@@ -33,7 +33,7 @@
         </tbody>
     </table>
     {% else %}
-    <h1>تاکنون واحدی ثبت نشده است.</h1>
+    <h1>There is no Unit submited.</h1>
     {% endif %}    
 </div>
 {% endblock %}

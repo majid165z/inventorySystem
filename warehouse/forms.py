@@ -28,7 +28,7 @@ class MaterialRequisitionForm(forms.ModelForm):
         fields = ['number','date','project']
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['date'] = JalaliDateField(label='تاریخ درخواست', 
+        self.fields['date'] = JalaliDateField(label='Approved Date', 
             widget=AdminJalaliDateWidget 
         )
 
@@ -51,7 +51,7 @@ class ProcurementOrderForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if self.instance.pk:
             self.fields['mr'].queryset = self.fields['mr'].queryset.filter(project=self.instance.project)
-        self.fields['date'] = JalaliDateField(label='تاریخ سفارش خرید', 
+        self.fields['date'] = JalaliDateField(label='PO Date', 
             widget=AdminJalaliDateWidget 
         )
 
@@ -90,7 +90,7 @@ class PackingListForm(forms.ModelForm):
         if self.instance.pk:
             self.fields['mr'].queryset = self.fields['mr'].queryset.filter(project=self.instance.project)
             self.fields['po'].queryset = self.fields['po'].queryset.filter(mr=self.instance.mr)
-        self.fields['date'] = JalaliDateField(label='تاریخ بارنامه', 
+        self.fields['date'] = JalaliDateField(label='Packing List Date', 
             widget=AdminJalaliDateWidget 
         )
 

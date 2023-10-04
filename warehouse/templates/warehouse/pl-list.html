@@ -2,21 +2,21 @@
 {% load jalali_tags %}
 <div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
     <a class="btn btn-primary" style="float: left;" href="{% url 'pl_add' %}">+
-        ثبت بارنامه جدید    
+        Create Packing List  
         </a>
     
     {% if pls %}
     <table class="table table-striped">
         <thead>
             <tr>
-                <th scope="col">ردیف</th>
-                <th scope="col">شماره بارنامه</th>
-                <th scope="col">پروژه</th>
-                <th scope="col">MR</th>
-                <th scope="col">سفارش خرید</th>
-                <th scope="col">ثبت شده توسط</th>
-                <th scope="col">تاریخ بارنامه</th>
-                <th scope="col">تاریخ ثبت</th>
+                <th scope="col">#</th>
+                <th scope="col">Packing List Number</th>
+                <th scope="col">Project</th>
+                <th scope="col">MR Number</th>
+                <th scope="col">PO Number</th>
+                <th scope="col">Created By</th>
+                <th scope="col">Sent Date</th>
+                <th scope="col">Submited Date </th>
     
             </tr>
         </thead>
@@ -43,7 +43,7 @@
         </tbody>
     </table>
     {% else %}
-    <h1>تاکنون بارنامه ای ثبت نشده است.</h1>
+    <h1>There is no Packing List registered</h1>
     {% endif %}    
 </div>
 {% endblock %}

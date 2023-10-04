@@ -4,7 +4,7 @@ from django.db.models.fields import CharField
 from django.urls import reverse
 # Create your models here.
 class Item(models.Model):
-    name = models.CharField("شرج کالا",max_length=10)
+    name = models.CharField("Item Description",max_length=10)
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
     class Meta:
@@ -14,12 +14,12 @@ class Item(models.Model):
         return f'{self.name}'
 
 class Unit(models.Model):
-    name = models.CharField("نام واحد",max_length=10)
-    abrv = models.CharField("واحد اختصاری",max_length=10)
+    name = models.CharField("Unit Name",max_length=10)
+    abrv = models.CharField("Abriviation",max_length=10)
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
-        verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
+        verbose_name='Created By',null=True,on_delete=models.SET_NULL,
         related_name='units')
     class Meta:
         verbose_name = "واحد"
@@ -37,13 +37,13 @@ class WarehouseManager(models.Manager):
         return super().get_queryset().select_related('created_by')
 
 class Warehouse(models.Model):
-    name = models.CharField("نام انبار",max_length=40)
-    address = models.TextField("آدرس",blank=True,null=True)
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL,verbose_name='انباردارها',blank=True,limit_choices_to={'warehouse_keeper':True})
+    name = models.CharField("Name",max_length=40)
+    address = models.TextField("Address",blank=True,null=True)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL,verbose_name='Warehouse Keepers',blank=True,limit_choices_to={'warehouse_keeper':True})
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
-        verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
+        verbose_name='Created By',null=True,on_delete=models.SET_NULL,
         related_name='warehouses')
     
     objects = WarehouseManager()
@@ -56,12 +56,12 @@ class Warehouse(models.Model):
         return reverse('warehouse_edit',kwargs={'id':self.id})
 
 class Project(models.Model):
-    name = models.CharField("نام پروژه",max_length=40)
-    number = models.CharField("شماره پروژه",max_length=40)
+    name = models.CharField("Project Name",max_length=40)
+    number = models.CharField("Project Number",max_length=40)
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
-        verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
+        verbose_name='Created By',null=True,on_delete=models.SET_NULL,
         related_name='projects')
     
     objects = WarehouseManager()
@@ -77,9 +77,9 @@ class MaterialRequisitionManager(models.Manager):
         return super().get_queryset().select_related('created_by','project')
 
 class MaterialRequisition(models.Model):
-    number = models.CharField('شماره MR',max_length=200)
-    date = models.DateField('تاریخ تایید',blank=True)
-    project = models.ForeignKey(Project,verbose_name='پروژه',null=True,blank=True,
+    number = models.CharField('MR Number',max_length=200)
+    date = models.DateField('Approved Date',blank=True)
+    project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
         on_delete=models.SET_NULL,related_name='mr')
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
         verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
@@ -102,11 +102,11 @@ class MrItemManager(models.Manager):
         return super().get_queryset().select_related('mr','unit','item')
 class MrItem(models.Model):
     mr = models.ForeignKey(MaterialRequisition,related_name='items',on_delete=models.CASCADE)
-    number = models.PositiveIntegerField('شماره')
-    tag_number = models.CharField('Tag/Part number',max_length=200)
-    item = models.ForeignKey(Item,related_name='mritems',on_delete=models.CASCADE,verbose_name='شرح کالا')
-    unit = models.ForeignKey(Unit,on_delete=models.SET_NULL,null=True,related_name='items',verbose_name='واحد')
-    quantity = models.DecimalField('مقدار',max_digits=10,decimal_places=3)
+    number = models.PositiveIntegerField('Item Number')
+    tag_number = models.CharField('MESC Number',max_length=200,blank=True)
+    item = models.ForeignKey(Item,related_name='mritems',on_delete=models.CASCADE,verbose_name='Item Description')
+    unit = models.ForeignKey(Unit,on_delete=models.SET_NULL,null=True,related_name='items',verbose_name='Unit')
+    quantity = models.DecimalField('Quantity',max_digits=10,decimal_places=3)
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
     objects = MrItemManager()
@@ -121,15 +121,15 @@ class ProcurementOrderManager(models.Manager):
         return super().get_queryset().select_related('mr','created_by','project')
 
 class ProcurementOrder(models.Model):
-    project = models.ForeignKey(Project,verbose_name='پروژه',null=True,blank=True,
+    project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
         on_delete=models.SET_NULL,related_name='pos')
-    number = models.CharField('شماره PO',max_length=200)
-    mr = models.ForeignKey(MaterialRequisition,related_name='pos',on_delete=models.CASCADE,verbose_name='شماره درخواست کالا')
-    date = models.DateField('تاریخ درخواست',blank=True)
+    number = models.CharField('PO Number',max_length=200)
+    mr = models.ForeignKey(MaterialRequisition,related_name='pos',on_delete=models.CASCADE,verbose_name='MR Number')
+    date = models.DateField('Date Confirmed',blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
         verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
         related_name='pos')
-    company = models.CharField('شرکت فروشنده کالا',max_length=100)
+    company = models.CharField('Seller (Company Name)',max_length=100)
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
 
@@ -149,9 +149,9 @@ class POItemManager(models.Manager):
 class POItem(models.Model):
     po = models.ForeignKey(ProcurementOrder,related_name='items',on_delete=models.CASCADE)
     number = models.PositiveIntegerField('Mr Item No.')
-    item = models.ForeignKey(Item,related_name='poitems',on_delete=models.CASCADE,verbose_name='شرح کالا')
-    unit = models.ForeignKey(Unit,on_delete=models.SET_NULL,null=True,related_name='poitems',verbose_name='واحد')
-    quantity = models.DecimalField('مقدار',max_digits=10,decimal_places=3)
+    item = models.ForeignKey(Item,related_name='poitems',on_delete=models.CASCADE,verbose_name='Item Description')
+    unit = models.ForeignKey(Unit,on_delete=models.SET_NULL,null=True,related_name='poitems',verbose_name='Unit')
+    quantity = models.DecimalField('Quantity',max_digits=10,decimal_places=3)
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
     objects = POItemManager()
@@ -165,13 +165,13 @@ class PackingListManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().select_related('project','mr','po','created_by')
 class PackingList(models.Model):
-    project = models.ForeignKey(Project,verbose_name='پروژه',null=True,blank=True,
+    project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
         on_delete=models.SET_NULL,related_name='pls')
-    number = models.CharField('شماره بارنامه',max_length=200)
-    mr = models.ForeignKey(MaterialRequisition,related_name='pls',on_delete=models.CASCADE,verbose_name='شماره درخواست کالا')
-    po = models.ForeignKey(ProcurementOrder,related_name='pls',on_delete=models.CASCADE,verbose_name='شماره سفارش خرید کالا')
+    number = models.CharField('Packing List Number',max_length=200)
+    mr = models.ForeignKey(MaterialRequisition,related_name='pls',on_delete=models.CASCADE,verbose_name='MR Number')
+    po = models.ForeignKey(ProcurementOrder,related_name='pls',on_delete=models.CASCADE,verbose_name='PO Number')
     company = models.CharField('شرکت فروشنده کالا',max_length=100)
-    date = models.DateField('تاریخ درخواست',blank=True)
+    date = models.DateField('Sent Date',blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
         verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
         related_name='pls')
@@ -196,9 +196,9 @@ class PLItemManager(models.Manager):
 class PLItem(models.Model):
     pl = models.ForeignKey(PackingList,related_name='items',on_delete=models.CASCADE)
     number = models.PositiveIntegerField('Mr Item No.')
-    item = models.ForeignKey(Item,related_name='plitems',on_delete=models.CASCADE,verbose_name='شرح کالا')
-    unit = models.ForeignKey(Unit,on_delete=models.SET_NULL,null=True,related_name='plitems',verbose_name='واحد')
-    quantity = models.DecimalField('مقدار',max_digits=10,decimal_places=3)
+    item = models.ForeignKey(Item,related_name='plitems',on_delete=models.CASCADE,verbose_name='Item Description')
+    unit = models.ForeignKey(Unit,on_delete=models.SET_NULL,null=True,related_name='plitems',verbose_name='Unit')
+    quantity = models.DecimalField('Quantity',max_digits=10,decimal_places=3)
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
     objects = PLItemManager()

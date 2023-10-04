@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary mb-2">
   <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'home' %}">شرکت مارون مناطق</a>
+    <a class="navbar-brand" href="{% url 'home' %}">Maroon Manategh Co.</a>
     <button
       class="navbar-toggler"
       type="button"
@@ -13,7 +13,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="homeNavBar">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
         {% if request.user.is_authenticated and request.user.is_superuser %}
         <li class="nav-item dropdown">
@@ -24,12 +24,12 @@
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            کابرها
+            Users
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'user_list' %}">فهرست کاربران</a></li>
+            <li><a class="dropdown-item" href="{% url 'user_list' %}">List of Users </a></li>
             <li><hr class="dropdown-divider" /></li>
-            <li><a class="dropdown-item" href="{% url 'create_user' %}">ایجاد کاربر جدید</a></li>
+            <li><a class="dropdown-item" href="{% url 'create_user' %}">Create a new User </a></li>
           </ul>
         </li>
         {% endif %}
@@ -42,14 +42,14 @@
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            انبارها
+            Warehouses
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'warehouse_list' %}">فهرست انبارها</a></li>
-            <li><a class="dropdown-item" href="{% url 'warehouse_add' %}">ثبت انبار جدید</a></li>
+            <li><a class="dropdown-item" href="{% url 'warehouse_list' %}">List of Warehouses</a></li>
+            <li><a class="dropdown-item" href="{% url 'warehouse_add' %}">create a new Warehouse</a></li>
             <li><hr class="dropdown-divider" /></li>
-            <li><a class="dropdown-item" href="{% url 'unit_list' %}">فهرست یکاها (واحد)</a></li>
-            <li><a class="dropdown-item" href="{% url 'unit_add' %}">ثبت یکا (واحد) جدید</a></li>
+            <li><a class="dropdown-item" href="{% url 'unit_list' %}">List of Units</a></li>
+            <li><a class="dropdown-item" href="{% url 'unit_add' %}">Create a new Unit </a></li>
           </ul>
         </li>
 
@@ -61,11 +61,11 @@
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            پروژه ها
+          Projects
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'project_list' %}">فهرست پروژه ها</a></li>
-            <li><a class="dropdown-item" href="{% url 'project_add' %}">ثبت پروژه جدید</a></li>
+            <li><a class="dropdown-item" href="{% url 'project_list' %}">List of Projects</a></li>
+            <li><a class="dropdown-item" href="{% url 'project_add' %}">Create a new Project</a></li>
           </ul>
         </li>
 
@@ -82,18 +82,20 @@
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              چرخه کالا
+              Procurement Cycle
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="{% url 'mr_list' %}">فهرست درخواست های کالا</a></li>
-              <li><a class="dropdown-item" href="{% url 'mr_add' %}">ثبت درخواست کالا جدید</a></li>
+              <li><a class="dropdown-item" href="{% url 'mr_list' %}">List of MRs</a></li>
+              <li><a class="dropdown-item" href="{% url 'mr_add' %}">Create a new MR </a></li>
+
               <li><hr class="dropdown-divider" /></li>
               
-              <li><a class="dropdown-item" href="{% url 'po_list' %}">فهرست سفارشات کالا</a></li>
-              <li><a class="dropdown-item" href="{% url 'po_add' %}">ثبت سفارش کالا جدید</a></li>
+              <li><a class="dropdown-item" href="{% url 'po_list' %}">List of POs</a></li>
+              <li><a class="dropdown-item" href="{% url 'po_add' %}">Create a new PO </a></li>
               <li><hr class="dropdown-divider" /></li>
-              <li><a class="dropdown-item" href="{% url 'pl_list' %}">فهرست بارنامه ها</a></li>
-              <li><a class="dropdown-item" href="{% url 'pl_add' %}">ثبت بارنامه جدید</a></li>
+              <li><a class="dropdown-item" href="{% url 'pl_list' %}">List of Packing Lists </a></li>
+              <li><a class="dropdown-item" href="{% url 'pl_add' %}">Create a new Packing List </a></li>
+
             </ul>
           </li>          
           {% endif %}
@@ -102,7 +104,7 @@
 
       </ul>
 
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           {% if request.user.is_authenticated %}
         <li class="nav-item dropdown">
           <a
@@ -115,9 +117,9 @@
             {{request.user.first_name}} {{request.user.last_name}}
           </a>
           <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{% url 'password_change' %}">تغییر رمز</a></li>
+            <li><a class="dropdown-item" href="{% url 'password_change' %}">Change your password</a></li>
             <li><hr class="dropdown-divider" /></li>
-            <li><a class="dropdown-item" href="{% url 'logout' %}">خروچ از سیستم</a></li>
+            <li><a class="dropdown-item" href="{% url 'logout' %}">Exit (logout)</a></li>
           </ul>
         </li>
         {% endif %}

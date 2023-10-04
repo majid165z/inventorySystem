@@ -1,20 +1,20 @@
 {% extends 'core/base.html' %} {% block content %}
 {% load jalali_tags %}
 <div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
-    <a class="btn btn-primary" style="float: left;" href="{% url 'mr_add' %}">+
-        ثبت درخواست اولیه جدید    
+    <a class="btn btn-primary" style="float: right;" href="{% url 'mr_add' %}">+
+        Create MR   
         </a>
     
     {% if mrs %}
     <table class="table table-striped">
         <thead>
             <tr>
-                <th scope="col">ردیف</th>
-                <th scope="col">شماره درخواست</th>
-                <th scope="col">پروژه</th>
-                <th scope="col">ثبت شده توسط</th>
-                <th scope="col">تاریخ درخواست</th>
-                <th scope="col">تاریخ ثبت</th>
+                <th scope="col">#</th>
+                <th scope="col">MR Number</th>
+                <th scope="col">Project</th>
+                <th scope="col">Created By</th>
+                <th scope="col">Date Approved</th>
+                <th scope="col">Date Created</th>
     
             </tr>
         </thead>
@@ -39,7 +39,7 @@
         </tbody>
     </table>
     {% else %}
-    <h1>تاکنون درخواستی ثبت نشده است.</h1>
+    <h1>There is no MR registed.</h1>
     {% endif %}    
 </div>
 {% endblock %}
