@@ -454,7 +454,7 @@ def mrs_edit(request:HttpRequest,id):
     inline_form = None
     if request.method == 'POST' and form.is_valid():
         obj = form.save()
-        inline_form = MRSItemFromSet(request.POST,instance=pl,form_kwargs={"pl":mrs.pl})
+        inline_form = MRSItemFromSet(request.POST,instance=mrs,form_kwargs={"pl":mrs.pl})
         if inline_form.is_valid():
             inline_form.save()
             msg = 'MRS was edited successfully.'
