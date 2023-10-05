@@ -44,7 +44,7 @@ class="row flex justify-content-center align-content-center align-items-center">
         </div>
         <div id="formset" class="my-3">
             {% if formset %}
-                {% include 'warehouse/partials/pl_form.html' %}
+                {% include 'warehouse/partials/mrs_form.html' %}
             {% endif %}
         </div>
 
@@ -74,10 +74,22 @@ class="row flex justify-content-center align-content-center align-items-center">
 <script>
 
     $(document).ready(function(){
+        let total_items = 0
+        
         {% if mrs %}
-        $('#id_mr,#id_po,#id_project').prop('disabled', true);
+        $('#id_mr,#id_po,#id_project,#id_pl').prop('disabled', true);
         $("select[id$='-item']").prop('disabled',true)
         $("select[id$='-unit']").prop('disabled',true)
+        total_items = 0
+        let numberOfItems = 0
+        $("input[id$='-quantity']").each(function(i,el){
+            total_items += Number($(this).val())
+            if (Number($(this).val()) > 0){
+                numberOfItems += 1
+            }
+        })
+        $("#total_items").text("").text(" "+total_items.toString())
+        $("#number_of_items").text("").text(" "+numberOfItems.toString())
 
         {% else %}
         $('#id_mr,#id_po,#id_pl').prop('disabled', true);
@@ -218,6 +230,18 @@ class="row flex justify-content-center align-content-center align-items-center">
                     let unit_id = ev_id.replace("-number","-unit")
                     $("#"+unit_id).val(data.unit).change()
                 })
+            }
+            if(ev_id && ev_id.includes("-quantity")){
+                total_items = 0
+                let numberOfItems = 0
+                $("input[id$='-quantity']").each(function(i,el){
+                    total_items += Number($(this).val())
+                    if (Number($(this).val()) > 0){
+                        numberOfItems += 1
+                    }
+                })
+                $("#total_items").text("").text(" "+total_items.toString())
+                $("#number_of_items").text("").text(" "+numberOfItems.toString())
             }
         })
         
