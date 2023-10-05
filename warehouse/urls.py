@@ -30,7 +30,16 @@ urlpatterns = [
     path('packing-list-add',views.pl_add,name='pl_add'),
     path('packing-list-list',views.pl_list,name='pl_list'),
     path('packing-list-edit/<int:id>',views.pl_edit,name='pl_edit'),
-
+    # Condition urls
+    path('condition-list',views.condition_list,name='condition_list'),
+    path('condition-add',views.condition_add,name='condition_add'),
+    path('condition-edit/<int:id>',views.condition_edit,name='condition_edit'),
+    
+    # Material Reciept Sheet Urls
+    path('material-receipt-sheet-add',views.mrs_add,name='mrs_add'),
+    path('material-receipt-sheet-list',views.mrs_list,name='mrs_list'),
+    path('material-receipt-sheet-edit/<int:id>',views.mrs_edit,name='mrs_edit'),
+    
     # AJAX calls ----------------------------------------
     path('ajax/create_item_name',views.create_item_name,name='create_item_name'),
     path('ajax/get_project_mr',views.get_project_mr,name='get_project_mr'),
@@ -39,5 +48,7 @@ urlpatterns = [
     path('ajax/get_item_desc',views.get_item_desc,name='get_item_desc'),
     path('ajax/get_po_list',views.get_po_list,name='get_po_list'),
     path('ajax/get_pl_formset',views.get_pl_formset,name='get_pl_formset'),
+    path('ajax/get_pl_items',views.get_pl_items,name='get_pl_items'),
+    path('ajax/get_mrs_formset',views.get_mrs_formset,name='get_mrs_formset'),
     # path('get_po_items',views.get_po_items,name='get_po_items'),
 ]

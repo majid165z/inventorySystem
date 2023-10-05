@@ -39,7 +39,7 @@ class WarehouseManager(models.Manager):
 class Warehouse(models.Model):
     name = models.CharField("Name",max_length=40)
     address = models.TextField("Address",blank=True,null=True)
-    users = models.ManyToManyField(settings.AUTH_USER_MODEL,verbose_name='Warehouse Keepers',blank=True,limit_choices_to={'warehouse_keeper':True})
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL,verbose_name='Warehouse Keepers',blank=True,limit_choices_to={'warehouse_keeper':True},related_name='whs')
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -207,3 +207,66 @@ class PLItem(models.Model):
         verbose_name_plural = "اقلام بارنامه"
     def __str__(self) -> str:
         return self.item.name
+class Condition(models.Model):
+    name = models.CharField('Condition',max_length=20)
+    created = models.DateTimeField(auto_now=False,auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+        verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
+        related_name='conditions')
+    class Meta:
+        verbose_name = "Condition"
+        verbose_name_plural = "Conditions"
+        ordering = ['-created']
+    def __str__(self) -> str:
+        return self.name
+
+class MRStManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('project','mr','po','pl','created_by')
+    
+class MaterialReceiptSheet(models.Model):
+    project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
+        on_delete=models.SET_NULL,related_name='mrs')
+    number = models.CharField('MRS Number',max_length=200)
+    mr = models.ForeignKey(MaterialRequisition,related_name='mrs',on_delete=models.CASCADE,verbose_name='MR Number')
+    po = models.ForeignKey(ProcurementOrder,related_name='mrs',on_delete=models.CASCADE,verbose_name='PO Number')
+    pl = models.ForeignKey(PackingList,related_name='mrs',on_delete=models.CASCADE,verbose_name='Packing List Number')
+    warehouse = models.ForeignKey(Warehouse,related_name='mrs',on_delete=models.CASCADE,verbose_name='Warehouse')
+    vendor = models.CharField('Vendor',max_length=100)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+        verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
+        related_name='mrs')
+    created = models.DateTimeField(auto_now=False,auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    objects = PackingListManager()
+    class Meta:
+        verbose_name = "Material Receipt Sheet"
+        verbose_name_plural = "Material Receipt Sheets"
+        ordering = ['-created']
+    def __str__(self) -> str:
+        return self.number
+    def get_edit_url(self):
+        return reverse('mrs_edit',kwargs={'id':self.id}) #TODO
+
+class MRSItemManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('mrs','unit','condition')
+class MRSItem(models.Model):
+    mrs = models.ForeignKey(MaterialReceiptSheet,related_name='items',on_delete=models.CASCADE)
+    number = models.PositiveIntegerField('Mr Item No.')
+    item = models.ForeignKey(Item,related_name='mrsitems',on_delete=models.CASCADE,verbose_name='Item Description')
+    unit = models.ForeignKey(Unit,on_delete=models.SET_NULL,null=True,related_name='mrsitems',verbose_name='Unit')
+    quantity = models.DecimalField('Quantity',max_digits=10,decimal_places=3)
+    condition = models.ForeignKey(Condition,related_name='mrsitems',verbose_name='Condition',on_delete=models.CASCADE,default=1)
+    loc = models.CharField('loc',max_length=10,null=True,blank=True)
+
+    created = models.DateTimeField(auto_now=False,auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    objects = MRSItemManager()
+    class Meta:
+        verbose_name = "MRS Item"
+        verbose_name_plural = "MRS Items"
+    def __str__(self) -> str:
+        return self.item.name
+

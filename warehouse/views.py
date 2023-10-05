@@ -2,14 +2,17 @@ from django.shortcuts import render, redirect
 from .forms import (UnitForm,ProjectForm,
     MaterialRequisitionForm, WarehouseForm,MrItemFromSet,
     ProcurementOrderForm,POItemFromSet,
-    PackingListForm,PLItemForm,PLItemFromSet
+    PackingListForm,PLItemForm,PLItemFromSet,
+    MaterialReceiptSheetForm,MRSItemFromSet,ConditionForm
     )
 from django.http import HttpRequest,JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import (Project,MaterialRequisition, MrItem, Unit, Warehouse,Item,
 POItem, ProcurementOrder,
-PackingList
+PackingList,
+MaterialReceiptSheet,
+Condition
 )
 # Create your views here.
 
@@ -102,7 +105,6 @@ def unit_add(request:HttpRequest):
     }
     return render(request,'warehouse/unit_add.html',context)
 @login_required
-
 def unit_edit(request:HttpRequest,id):
     user = request.user
     if not user.is_superuser:
@@ -359,7 +361,123 @@ def pl_edit(request:HttpRequest,id):
         'pl':pl,
     }
     return render(request,'warehouse/pl-add.html',context)
+@login_required
+def condition_list(request:HttpRequest):
+    conditions = Condition.objects.all()
+    context = {'title':'Item Conditions',
+    'units':conditions
+    }
+    return render(request,'warehouse/condition_list.html',context)
 
+@login_required
+def condition_add(request:HttpRequest):
+    user = request.user
+    if not user.is_superuser:
+        msg = "You don't have the required permission."
+        messages.error(request,msg)
+        return redirect('condition_list')
+    form = ConditionForm(request.POST or None)
+    if form.is_valid():
+        obj = form.save(commit=False)
+        obj.created_by = user
+        obj.save()
+        msg = "The Unit was created successfully."
+        messages.success(request,msg)
+        return redirect('condition_list')
+    context = {
+        'title': "Create Condition",
+        'form' : form
+    }
+    return render(request,'warehouse/unit_add.html',context)
+@login_required
+def condition_edit(request:HttpRequest,id):
+    user = request.user
+    if not user.is_superuser:
+        msg = "You don't have the required permission."
+        messages.error(request,msg)
+        return redirect('condition_list')
+    instance = Condition.objects.get(id=id)
+    form = ConditionForm(request.POST or None,instance=instance)
+    if form.is_valid():
+        obj = form.save()
+        msg = "The unit was edited successfully."
+        messages.success(request,msg)
+        return redirect('condition_list')
+    context = {
+        'title': "Edit Condition",
+        'form' : form
+    }
+    return render(request,'warehouse/unit_add.html',context)
+
+@login_required
+def mrs_list(request:HttpRequest):
+    mrss = MaterialReceiptSheet.objects.all()
+    context = {
+        'title':'Material Receipt Sheet List',
+        'mrss':mrss
+    }
+    return render(request,'warehouse/mrs-list.html',context)
+
+@login_required
+def mrs_add(request:HttpRequest):
+    user = request.user
+    form = MaterialReceiptSheetForm(user,request.POST or None)
+    inline_form = None
+    if request.method == 'POST' and form.is_valid():
+        obj = form.save(commit=False)
+        inline_form = MRSItemFromSet(request.POST,instance=obj,form_kwargs={"pl":obj.pl})
+        if inline_form.is_valid():
+            obj.created_by = user
+            obj.vendor = obj.pl.company
+            obj.save()
+            inline_form.save()
+            msg = 'MRS was created successfully.'
+            messages.success(request,msg)
+            return redirect('mrs_list')
+        else:
+            print(inline_form.errors)
+    else:
+        print(form.errors)
+    
+    context = {
+        'title': 'Create Material Receipt Sheet',
+        'form':form,
+        'formset':inline_form
+    }
+    return render(request,'warehouse/mrs-add.html',context)
+
+@login_required
+def mrs_edit(request:HttpRequest,id):
+    user = request.user
+    mrs = MaterialReceiptSheet.objects.get(id=id)
+    form = MaterialReceiptSheetForm(request.POST or None,instance=mrs)
+    inline_form = None
+    if request.method == 'POST' and form.is_valid():
+        obj = form.save()
+        inline_form = MRSItemFromSet(request.POST,instance=pl,form_kwargs={"pl":mrs.pl})
+        if inline_form.is_valid():
+            inline_form.save()
+            msg = 'MRS was edited successfully.'
+            messages.success(request,msg)
+            return redirect('mrs_list')
+        else:
+            print(inline_form.errors)
+    else:
+        print(form.errors)
+        
+    if inline_form:
+        formset = inline_form
+    else:
+        formset = MRSItemFromSet(request.POST or None,instance=mrs,form_kwargs={"pl":mrs.pl})
+        formset.extra = 0
+
+    context = {
+        'title': 'Edit MRS',
+        'form':form,
+        'formset':formset,
+        'mrs':mrs,
+    }
+    return render(request,'warehouse/mrs-add.html',context)
 
 # # -----------------------------------
 # # ajax calls
@@ -424,6 +542,19 @@ def get_pl_formset(request):
         formset = PLItemFromSet(form_kwargs={'po':po})
         return render(request,'warehouse/partials/pl_form.html',context={'formset':formset})
 
+@login_required
+def get_pl_items(request):
+    po_id = request.GET.get('po_id',None)
+    if po_id:
+        pls = PackingList.objects.filter(po__id=po_id)
+        return render(request,'warehouse/partials/pl_items.html',context={'pls':pls})
+@login_required
+def get_mrs_formset(request):
+    pl_id = request.GET.get('pl_id',None)
+    if pl_id:
+        pl = PackingList.objects.get(id=pl_id)
+        formset = MRSItemFromSet(form_kwargs={'pl':pl})
+        return render(request,'warehouse/partials/mrs_form.html',context={'formset':formset})
 # @login_required
 # def get_po_items(request):
 #     po_id = request.GET.get('id',None)

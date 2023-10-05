@@ -1,0 +1,47 @@
+{% extends 'core/base.html' %} {% block content %}
+{% load jalali_tags %}
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    <a class="btn btn-primary" style="float: right;" href="{% url 'mrs_add' %}">+
+        Create MRS   
+        </a>
+    
+    {% if mrss %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">MRS Number</th>
+                <th scope="col">Project</th>
+                <th scope="col">MR Number</th>
+                <th scope="col">PO Number</th>
+                <th scope="col">PL Number</th>
+                <th scope="col">Created By</th>
+                <th scope="col">Date Created</th>
+    
+            </tr>
+        </thead>
+        <tbody>
+            {% for mrs in mrss %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><a href="{{mrs.get_edit_url}}">{{mrs.number}}</a></td>
+                <td>{{mrs.project}}</td>
+                <td>{{mrs.mr}}</td>
+                <td>{{mrs.po}}</td>
+                <td>{{mrs.pl}}</td>
+                <td>
+                    {{mrs.created_by.first_name}} {{mrs.created_by.last_name}} ({{mrs.created_by}})
+                </td>
+                <td>
+                    {{mrs.created|to_jalali:'%Y/%m/%d'}}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>There is no MRS registed.</h1>
+    {% endif %}    
+</div>
+{% endblock %}
