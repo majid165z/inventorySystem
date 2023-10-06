@@ -1,6 +1,6 @@
 from django.db import models
+from django.db.models import Sum
 from django.conf import settings
-from django.db.models.fields import CharField
 from django.urls import reverse
 # Create your models here.
 class Item(models.Model):
@@ -269,4 +269,99 @@ class MRSItem(models.Model):
         verbose_name_plural = "MRS Items"
     def __str__(self) -> str:
         return self.item.name
+    def save(self,*args,**kwargs):
+        super().save(*args,**kwargs)
+        iv,created = inventoryItem.objects.get_or_create(
+            project = self.mrs.project,
+            warehouse = self.mrs.warehouse,
+            item = self.item
+            )
+        if created:
+            iv.incoming = self.quantity
+        else:
+            iv.incoming = MRSItem.objects.filter(mrs__project=self.mrs.project,
+                                                 mrs__warehouse = self.mrs.warehouse,
+                                                 item = self.item
+                                                 ).aggregate(total=Sum('quantity'))['total']
+        iv.save()
+class InventoryItemManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('project','warehouse','item')
 
+class inventoryItem(models.Model):
+    project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
+        on_delete=models.SET_NULL,related_name='ivitems')
+    warehouse = models.ForeignKey(Warehouse,related_name='ivitems',on_delete=models.CASCADE,verbose_name='Warehouse')
+    item = models.ForeignKey(Item,related_name='ivitems',on_delete=models.CASCADE,verbose_name='Item Description')
+    condition = models.ForeignKey(Condition,related_name='ivitems',verbose_name='Condition',on_delete=models.CASCADE,default=1)
+    incoming = models.DecimalField('incoming',max_digits=10,decimal_places=3,default=0)
+    outgoing = models.DecimalField('outgoing',max_digits=10,decimal_places=3,default=0)
+    remaining = models.DecimalField('remaining',max_digits=10,decimal_places=3,default=0)
+    objects = InventoryItemManager()
+    total_in_all_warehouse_project = models.DecimalField('total_in_all_warehouse_project',max_digits=10,decimal_places=3,default=0)
+    total_in_all = models.DecimalField('total_in_all',max_digits=10,decimal_places=3,default=0)
+    class Meta:
+        verbose_name = "inventory Item"
+        verbose_name_plural = "inventory Item"
+    def save(self,*args,**kwargs):
+        self.remaining = self.incoming - self.outgoing
+        super().save(*args,**kwargs)
+        
+        inventoryItem.objects.filter(item=self.item,project=self.project).update(
+             total_in_all_warehouse_project=inventoryItem.objects.filter(item=self.item,project=self.project).aggregate(total=Sum('remaining'))['total'])
+        inventoryItem.objects.filter(item=self.item).update(
+             total_in_all=inventoryItem.objects.filter(item=self.item).aggregate(total=Sum('remaining'))['total'])
+                
+        
+    def __str__(self) -> str:
+        return self.item.name
+class MaterialIssueRequest(models.Model):
+    project = models.ForeignKey(Project,verbose_name='Project',null=True,blank=True,
+        on_delete=models.SET_NULL,related_name='mir')
+    number = models.CharField('MIR Number',max_length=200)
+    mr = models.ForeignKey(MaterialRequisition,related_name='mir',on_delete=models.CASCADE,verbose_name='MR Number')
+    po = models.ForeignKey(ProcurementOrder,related_name='mir',on_delete=models.CASCADE,verbose_name='PO Number')
+    pl = models.ForeignKey(PackingList,related_name='mir',on_delete=models.CASCADE,verbose_name='Packing List Number')
+    warehouse = models.ForeignKey(Warehouse,related_name='mir',on_delete=models.CASCADE,verbose_name='Origin(From)')
+    issue_date = models.DateField('Issue Date',blank=True)
+    required_date = models.DateField('Required Date',blank=True)
+    client_department = models.CharField("Client Department",max_length=100)
+    sent_to_warehouse = models.BooleanField("sent to warehouse",default=False)
+    sent_to_location = models.BooleanField("sent to location",default=False)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+        verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
+        related_name='mir')
+    created = models.DateTimeField(auto_now=False,auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    objects = PackingListManager()
+    class Meta:
+        verbose_name = "Material Issue Request"
+        verbose_name_plural = "Material Issue Requests"
+        ordering = ['-created']
+    def __str__(self) -> str:
+        return self.number
+    def get_edit_url(self):
+        return reverse('mir_edit',kwargs={'id':self.id}) #TODO
+
+class MIRItemManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('mir','unit','item')
+class MIRItem(models.Model):
+    mir = models.ForeignKey(MaterialIssueRequest,related_name='items',on_delete=models.CASCADE)
+    number = models.PositiveIntegerField('Mr Item No.')
+    item = models.ForeignKey(Item,related_name='miritems',on_delete=models.CASCADE,verbose_name='Item Description')
+    unit = models.ForeignKey(Unit,on_delete=models.SET_NULL,null=True,related_name='miritems',verbose_name='Unit')
+    quantity = models.DecimalField('Quantity',max_digits=10,decimal_places=3)
+    remarks = models.CharField('remakrs',max_length=200,null=True,blank=True)
+    condition = models.ForeignKey(Condition,related_name='miritems',verbose_name='Condition',on_delete=models.CASCADE,default=1)
+
+    created = models.DateTimeField(auto_now=False,auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    objects = MIRItemManager()
+    class Meta:
+        verbose_name = "MIR Item"
+        verbose_name_plural = "MIR Items"
+    def __str__(self) -> str:
+        return self.item.name
+    def save(self,*args,**kwargs):
+        super().save(*args,**kwargs)

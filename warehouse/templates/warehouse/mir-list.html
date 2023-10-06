@@ -1,16 +1,16 @@
 {% extends 'core/base.html' %} {% block content %}
 {% load jalali_tags %}
 <div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
-    <a class="btn btn-primary" style="float: right;" href="{% url 'mrs_add' %}">+
-        Create MRS   
+    <a class="btn btn-primary" style="float: right;" href="{% url 'mir_add' %}">+
+        Create MIR   
         </a>
     
-    {% if mrss %}
+    {% if mirs %}
     <table class="table table-striped">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">MRS Number</th>
+                <th scope="col">MIR Number</th>
                 <th scope="col">Project</th>
                 <th scope="col">MR Number</th>
                 <th scope="col">PO Number</th>
@@ -22,7 +22,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for mrs in mrss %}
+            {% for mrs in mirs %}
             <tr>
                 <th scope="row">{{forloop.counter}}</th>
                 <td><a href="{{mrs.get_edit_url}}">{{mrs.number}}</a></td>
@@ -43,7 +43,7 @@
         </tbody>
     </table>
     {% else %}
-    <h1>There is no MRS registered.</h1>
+    <h1>There is no MIR registered.</h1>
     {% endif %}    
 </div>
 {% endblock %}

@@ -3,7 +3,8 @@ from .forms import (UnitForm,ProjectForm,
     MaterialRequisitionForm, WarehouseForm,MrItemFromSet,
     ProcurementOrderForm,POItemFromSet,
     PackingListForm,PLItemForm,PLItemFromSet,
-    MaterialReceiptSheetForm,MRSItemFromSet,ConditionForm
+    MaterialReceiptSheetForm,MRSItemFromSet,ConditionForm,
+    MaterialIssueRequestForm,MIRItemFromSet
     )
 from django.http import HttpRequest,JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -11,9 +12,11 @@ from django.contrib import messages
 from .models import (Project,MaterialRequisition, MrItem, Unit, Warehouse,Item,
 POItem, ProcurementOrder,
 PackingList,
-MaterialReceiptSheet,
-Condition
+MaterialReceiptSheet,MRSItem,
+Condition,inventoryItem,
+MaterialIssueRequest,MIRItem
 )
+from django.db.models import Sum, Q
 # Create your views here.
 
 @login_required
@@ -450,7 +453,7 @@ def mrs_add(request:HttpRequest):
 def mrs_edit(request:HttpRequest,id):
     user = request.user
     mrs = MaterialReceiptSheet.objects.get(id=id)
-    form = MaterialReceiptSheetForm(request.POST or None,instance=mrs)
+    form = MaterialReceiptSheetForm(user,request.POST or None,instance=mrs)
     inline_form = None
     if request.method == 'POST' and form.is_valid():
         obj = form.save()
@@ -478,6 +481,75 @@ def mrs_edit(request:HttpRequest,id):
         'mrs':mrs,
     }
     return render(request,'warehouse/mrs-add.html',context)
+
+@login_required
+def mir_list(request:HttpRequest):
+    mirs = MaterialIssueRequest.objects.all()
+    context = {
+        'title':'Material Issue Request List',
+        'mirs':mirs
+    }
+    return render(request,'warehouse/mir-list.html',context)
+
+@login_required
+def mir_add(request:HttpRequest):
+    user = request.user
+    form = MaterialIssueRequestForm(request.POST or None)
+    inline_form = None
+    if request.method == 'POST' and form.is_valid():
+        obj = form.save(commit=False)
+        inline_form = MIRItemFromSet(request.POST,instance=obj,form_kwargs={"pl":obj.pl})
+        if inline_form.is_valid():
+            obj.created_by = user
+            obj.save()
+            inline_form.save()
+            msg = 'MIR was created successfully.'
+            messages.success(request,msg)
+            return redirect('mir_list')
+        else:
+            print(inline_form.errors)
+    else:
+        print(form.errors)
+    
+    context = {
+        'title': 'Create Material Issue Request',
+        'form':form,
+        'formset':inline_form
+    }
+    return render(request,'warehouse/mir-add.html',context)
+
+@login_required
+def mir_edit(request:HttpRequest,id):
+    user = request.user
+    mir = MaterialIssueRequest.objects.get(id=id)
+    form = MaterialIssueRequestForm(request.POST or None,instance=mir)
+    inline_form = None
+    if request.method == 'POST' and form.is_valid():
+        obj = form.save()
+        inline_form = MIRItemFromSet(request.POST,instance=mir,form_kwargs={"pl":mir.pl})
+        if inline_form.is_valid():
+            inline_form.save()
+            msg = 'MIR was edited successfully.'
+            messages.success(request,msg)
+            return redirect('mir_list')
+        else:
+            print(inline_form.errors)
+    else:
+        print(form.errors)
+        
+    if inline_form:
+        formset = inline_form
+    else:
+        formset = MIRItemFromSet(request.POST or None,instance=mir,form_kwargs={"pl":mir.pl})
+        formset.extra = 0
+
+    context = {
+        'title': 'Edit MIr',
+        'form':form,
+        'formset':formset,
+        'mir':mir,
+    }
+    return render(request,'warehouse/mir-add.html',context)
 
 # # -----------------------------------
 # # ajax calls
@@ -555,6 +627,28 @@ def get_mrs_formset(request):
         pl = PackingList.objects.get(id=pl_id)
         formset = MRSItemFromSet(form_kwargs={'pl':pl})
         return render(request,'warehouse/partials/mrs_form.html',context={'formset':formset})
+
+@login_required
+def get_mir_formset(request):
+    pl_id = request.GET.get('pl_id',None)
+    if pl_id:
+        pl = PackingList.objects.get(id=pl_id)
+        formset = MIRItemFromSet(form_kwargs={'pl':pl})
+        return render(request,'warehouse/partials/mir_form.html',context={'formset':formset})
+@login_required
+def get_pl_warehouse(request):
+    pl_id = request.GET.get('pl_id',None)
+    if pl_id:
+        whs = Warehouse.objects.filter(mrs__pl__id=pl_id)
+        return render(request,'warehouse/partials/pl_warehouse.html',context={'whs':whs})
+
+@login_required
+def get_warehouse_items(request):
+    wh_id = request.GET.get('id',None)
+    if wh_id:
+        # items = Item.objects.filter(mrsitems__mrs__warehouse__id=wh_id).annotate
+        items = inventoryItem.objects.filter(warehouse__id=wh_id)
+        return render(request,'warehouse/partials/warehouse_items.html',context={'items':items})
 # @login_required
 # def get_po_items(request):
 #     po_id = request.GET.get('id',None)

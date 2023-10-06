@@ -1,7 +1,8 @@
 from django import forms
 from .models import (Item,Warehouse,Unit,Project,MaterialRequisition,MrItem,
     POItem,ProcurementOrder,
-    PackingList,PLItem,MaterialReceiptSheet,MRSItem,Condition
+    PackingList,PLItem,MaterialReceiptSheet,MRSItem,Condition,
+    MaterialIssueRequest,MIRItem
     )
 from jalali_date.fields import JalaliDateField, SplitJalaliDateTimeField
 from jalali_date.widgets import AdminJalaliDateWidget, AdminSplitJalaliDateTime
@@ -162,3 +163,39 @@ class ConditionForm(forms.ModelForm):
     class Meta:
         model = Condition
         fields = ['name',]
+
+class MaterialIssueRequestForm(forms.ModelForm):
+    class Meta:
+        model = MaterialIssueRequest
+        fields = ['project','number','mr','po','pl','warehouse','issue_date','required_date','client_department',]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['mr'].queryset = self.fields['mr'].queryset.filter(project=self.instance.project)
+            self.fields['po'].queryset = self.fields['po'].queryset.filter(mr=self.instance.mr)
+            self.fields['pl'].queryset = self.fields['pl'].queryset.filter(mr=self.instance.mr)
+        self.fields['issue_date'] = JalaliDateField(label='Issue Date', 
+            widget=AdminJalaliDateWidget 
+        )
+        self.fields['required_date'] = JalaliDateField(label='Required Date', 
+            widget=AdminJalaliDateWidget 
+        )
+
+class MIRItemForm(forms.ModelForm):
+    class Mata:
+        model = MIRItem
+        fields = ['number','item','unit','quantity','remarks','condition']
+    def __init__(self, *args, **kwargs):
+        pl = kwargs.pop('pl',None)
+        super().__init__(*args, **kwargs)
+        if pl:
+            plitems = list(pl.items.all().values_list('number',flat=True))
+            mr_items = [("","-------")] + list(MrItem.objects.filter(id__in=plitems).values_list('id','number'))
+            self.fields['number'].widget = forms.Select(choices=mr_items)
+            self.fields['item'].queryset = Item.objects.filter(plitems__pl=pl)
+
+MIRItemFromSet = inlineformset_factory(
+    MaterialIssueRequest,MIRItem,form=MIRItemForm,extra=2,
+    can_delete=True,can_delete_extra=True,
+    fields=['number','item','unit','quantity','remarks','condition']
+)

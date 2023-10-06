@@ -1,7 +1,7 @@
 import warehouse
 from django.contrib import admin
 
-from .models import (Item,Unit,Warehouse,MrItem,MaterialRequisition,
+from .models import (Item,Unit,Warehouse,MrItem,MaterialRequisition,inventoryItem
 # ProcurementOrder,POItem,PackingList,PLItem
 )
 # Register your models here.
@@ -14,3 +14,8 @@ admin.site.register(MaterialRequisition)
 # admin.site.register(POItem)
 # admin.site.register(PackingList)
 # admin.site.register(PLItem)
+@admin.register(inventoryItem)
+class inventoryAdmin(admin.ModelAdmin):
+    list_display = ['item','project','warehouse','incoming','outgoing','remaining','total_in_all_warehouse_project','total_in_all']
+    list_display_links = ['item','project','warehouse','incoming','outgoing','remaining']
+    

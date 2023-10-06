@@ -40,6 +40,11 @@ urlpatterns = [
     path('material-receipt-sheet-list',views.mrs_list,name='mrs_list'),
     path('material-receipt-sheet-edit/<int:id>',views.mrs_edit,name='mrs_edit'),
     
+    # material Issue request urls
+    path('material-issue-request-list',views.mir_list,name='mir_list'),
+    path('material-issue-request-add',views.mir_add,name='mir_add'),
+    path('material-issue-request-edit/<int:id>',views.mir_edit,name='mir_edit'),
+    
     # AJAX calls ----------------------------------------
     path('ajax/create_item_name',views.create_item_name,name='create_item_name'),
     path('ajax/get_project_mr',views.get_project_mr,name='get_project_mr'),
@@ -50,5 +55,8 @@ urlpatterns = [
     path('ajax/get_pl_formset',views.get_pl_formset,name='get_pl_formset'),
     path('ajax/get_pl_items',views.get_pl_items,name='get_pl_items'),
     path('ajax/get_mrs_formset',views.get_mrs_formset,name='get_mrs_formset'),
+    path('ajax/get_warehouse_items',views.get_warehouse_items,name='get_warehouse_items'),
+    path('ajax/get_mir_formset',views.get_mir_formset,name='get_mir_formset'),
+    path('ajax/get_pl_warehouse',views.get_pl_warehouse,name='get_pl_warehouse'),
     # path('get_po_items',views.get_po_items,name='get_po_items'),
 ]

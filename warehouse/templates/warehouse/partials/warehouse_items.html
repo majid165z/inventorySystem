@@ -1,0 +1,50 @@
+{% if items %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Item Desc.</th>
+            <th scope="col">Project</th>
+            <th scope="col">Warehouse</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">
+                Quantity <br>
+                ALL Warehouses
+                <br>
+                (This Project)
+            </th>
+            <th scope="col">
+                Quantity <br>
+                ALL Projects
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <th scope="row">{{forloop.counter}}</th>
+            <td>{{item}}</td>
+            <td>
+                {{item.project}}
+            </td>
+            <td>
+                {{item.warehouse}}
+            </td>
+            <td>
+                {{item.remaining}}
+            </td>
+
+            <td>
+                {{item.total_in_all_warehouse_project}}
+            </td>
+
+            <td>
+                {{item.total_in_all}}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<h1>There is no warehouse keeper registred for this warehouse</h1>
+{% endif %}    

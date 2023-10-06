@@ -23,7 +23,10 @@
                     {{warehouse.address}}
                 </td>
                 <td>
-                    <button>List of Items</button>
+                    <button class="btn btn-info"
+                    data-bs-toggle="modal" data-bs-target="#WarehouseItems"
+                    data-bs-id = "{{warehouse.id}}">List of Items</button>
+                    
                 </td>
                 <td>
                     <button class="btn btn-info"
@@ -54,7 +57,19 @@
       </div>
     </div>
 </div>
-
+<!-- Modal for warehouse items -->
+<div class="modal fade" id="WarehouseItems" tabindex="-1" aria-labelledby="WarehouseItemsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="WarehouseItemsLabel">List of Warehouse Iems</h1>
+          <button type="button" class="btn-close m-0 p-0" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="warehouseitems_id">
+        </div>
+      </div>
+    </div>
+</div>
 {% endblock %}
 
 
@@ -72,6 +87,27 @@ if (warehouseKeeperModal) {
     $.ajax({
         method : 'get',
         url : '{% url "get_warehouse_keepers" %}',
+        data : {id:id}
+    }).done (function (data) {
+        modalContent.innerHTML = data
+    })
+  })
+}
+
+
+
+const warehouseItemsModal = document.getElementById('WarehouseItems')
+if (warehouseItemsModal) {
+    warehouseItemsModal.addEventListener('show.bs.modal', event => {
+    // Button that triggered the modal
+    const button = event.relatedTarget
+    // Extract info from data-bs-* attributes
+    const id = button.getAttribute('data-bs-id')
+    const modalContent = document.getElementById("warehouseitems_id")
+
+    $.ajax({
+        method : 'get',
+        url : '{% url "get_warehouse_items" %}',
         data : {id:id}
     }).done (function (data) {
         modalContent.innerHTML = data
