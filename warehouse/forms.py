@@ -2,7 +2,7 @@ from django import forms
 from .models import (Item,Warehouse,Unit,Project,MaterialRequisition,MrItem,
     POItem,ProcurementOrder,
     PackingList,PLItem,MaterialReceiptSheet,MRSItem,Condition,
-    MaterialIssueRequest,MIRItem
+    MaterialIssueRequest,MIRItem,Category
     )
 from jalali_date.fields import JalaliDateField, SplitJalaliDateTimeField
 from jalali_date.widgets import AdminJalaliDateWidget, AdminSplitJalaliDateTime
@@ -17,6 +17,10 @@ class UnitForm(forms.ModelForm):
     class Meta:
         model = Unit
         fields = ['name','abrv']
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name',]
 
 class ProjectForm(forms.ModelForm):
     class Meta:
@@ -26,7 +30,7 @@ class ProjectForm(forms.ModelForm):
 class MaterialRequisitionForm(forms.ModelForm):
     class Meta:
         model = MaterialRequisition
-        fields = ['number','date','project']
+        fields = ['number','date','project','category']
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['date'] = JalaliDateField(label='Approved Date', 

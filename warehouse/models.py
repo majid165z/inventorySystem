@@ -8,6 +8,10 @@ class Category(models.Model):
     name = models.CharField("Category Name",max_length=50)
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+        verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
+        related_name='categories')
+    
     class Meta:
         verbose_name = "category"
         verbose_name_plural = "categories"
@@ -85,7 +89,7 @@ class Project(models.Model):
         return reverse('project_edit',kwargs={'id':self.id}) #TODO
 class MaterialRequisitionManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('created_by','project')
+        return super().get_queryset().select_related('created_by','project','category')
 
 class MaterialRequisition(models.Model):
     number = models.CharField('MR Number',max_length=200)

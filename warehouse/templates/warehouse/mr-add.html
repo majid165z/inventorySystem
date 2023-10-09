@@ -12,16 +12,20 @@ class="row flex justify-content-center align-content-center align-items-center">
             <p class="text-red">{{ value|escape }}</p>
           {% endfor %}
         {% endif %}
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-3">
             <p class="pb-1 mb-1 text-center">{{ form.project.label_tag }}</p>
             {{ form.project }}
         </div>
         
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-3">
             <p class="pb-1 mb-1 text-center">{{ form.number.label_tag }}</p>
             {{ form.number }}
         </div>
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-3">
+            <p class="pb-1 mb-1 text-center">{{ form.category.label_tag }}</p>
+            {{ form.category }}
+        </div>
+        <div class="col-12 col-md-3">
             <p class="pb-1 mb-1 text-center">{{ form.date.label_tag }}</p>
             {{ form.date }}
         </div>

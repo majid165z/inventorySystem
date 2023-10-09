@@ -4,7 +4,7 @@ from .forms import (UnitForm,ProjectForm,
     ProcurementOrderForm,POItemFromSet,
     PackingListForm,PLItemForm,PLItemFromSet,
     MaterialReceiptSheetForm,MRSItemFromSet,ConditionForm,
-    MaterialIssueRequestForm,MIRItemFromSet
+    MaterialIssueRequestForm,MIRItemFromSet,CategoryForm
     )
 from django.http import HttpRequest,JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -14,7 +14,7 @@ POItem, ProcurementOrder,
 PackingList,
 MaterialReceiptSheet,MRSItem,
 Condition,inventoryItem,
-MaterialIssueRequest,MIRItem
+MaterialIssueRequest,MIRItem,Category
 )
 from django.db.models import Sum, Q
 # Create your views here.
@@ -79,6 +79,53 @@ def get_warehouse_keepers(request:HttpRequest):
         users = wh.users.all()
         return render(request,'warehouse/get_warehouse_keepers.html',context={'users':users})
 
+@login_required
+def category_list(request:HttpRequest):
+    units = Category.objects.all()
+    context = {'title':'Categories',
+    'units':units
+    }
+    return render(request,'warehouse/category_list.html',context)
+
+@login_required
+def category_add(request:HttpRequest):
+    user = request.user
+    if not user.is_superuser:
+        msg = "You don't have the required permission."
+        messages.error(request,msg)
+        return redirect('category_list')
+    form = CategoryForm(request.POST or None)
+    if form.is_valid():
+        obj = form.save(commit=False)
+        obj.created_by = user
+        obj.save()
+        msg = "The Category was created successfully."
+        messages.success(request,msg)
+        return redirect('category_list')
+    context = {
+        'title': "Create Category",
+        'form' : form
+    }
+    return render(request,'warehouse/unit_add.html',context)
+@login_required
+def category_edit(request:HttpRequest,id):
+    user = request.user
+    if not user.is_superuser:
+        msg = "You don't have the required permission."
+        messages.error(request,msg)
+        return redirect('category_list')
+    instance = Category.objects.get(id=id)
+    form = CategoryForm(request.POST or None,instance=instance)
+    if form.is_valid():
+        obj = form.save()
+        msg = "The Categort was edited successfully."
+        messages.success(request,msg)
+        return redirect('category_list')
+    context = {
+        'title': "Edit Category",
+        'form' : form
+    }
+    return render(request,'warehouse/unit_add.html',context)
 @login_required
 def unit_list(request:HttpRequest):
     units = Unit.objects.all()

@@ -34,7 +34,11 @@ urlpatterns = [
     path('condition-list',views.condition_list,name='condition_list'),
     path('condition-add',views.condition_add,name='condition_add'),
     path('condition-edit/<int:id>',views.condition_edit,name='condition_edit'),
-    
+    # categories urls
+    path('category-list',views.category_list,name='category_list'),
+    path('category-add',views.category_add,name='category_add'),
+    path('category-edit/<int:id>',views.category_edit,name='category_edit'),
+
     # Material Reciept Sheet Urls
     path('material-receipt-sheet-add',views.mrs_add,name='mrs_add'),
     path('material-receipt-sheet-list',views.mrs_list,name='mrs_list'),
