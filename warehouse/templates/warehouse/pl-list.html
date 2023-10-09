@@ -1,7 +1,7 @@
 {% extends 'core/base.html' %} {% block content %}
 {% load jalali_tags %}
 <div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
-    <a class="btn btn-primary" style="float: left;" href="{% url 'pl_add' %}">+
+    <a class="btn btn-primary" style="float: right;" href="{% url 'pl_add' %}">+
         Create Packing List  
         </a>
     
@@ -46,4 +46,13 @@
     <h1>There is no Packing List registered</h1>
     {% endif %}    
 </div>
+{% endblock %}
+{% block js %}
+<script>
+    $('table').DataTable(
+        {
+        "lengthMenu": [ 25, 50, 75, 100 ]
+        }
+    );
+</script>
 {% endblock %}

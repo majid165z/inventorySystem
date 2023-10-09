@@ -167,7 +167,7 @@ class ConditionForm(forms.ModelForm):
 class MaterialIssueRequestForm(forms.ModelForm):
     class Meta:
         model = MaterialIssueRequest
-        fields = ['project','number','mr','po','pl','warehouse','issue_date','required_date','client_department',]
+        fields = ['project','number','mr','po','pl','warehouse','issue_date','required_date','client_department','location']
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance.pk:

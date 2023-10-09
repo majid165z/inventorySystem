@@ -47,3 +47,12 @@
     {% endif %}    
 </div>
 {% endblock %}
+{% block js %}
+<script>
+    $('table').DataTable(
+        {
+        "lengthMenu": [ 25, 50, 75, 100 ]
+        }
+    );
+</script>
+{% endblock %}

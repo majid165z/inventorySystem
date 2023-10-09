@@ -3,6 +3,17 @@ from django.db.models import Sum
 from django.conf import settings
 from django.urls import reverse
 # Create your models here.
+
+class Category(models.Model):
+    name = models.CharField("Category Name",max_length=50)
+    created = models.DateTimeField(auto_now=False,auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    class Meta:
+        verbose_name = "category"
+        verbose_name_plural = "categories"
+    def __str__(self) -> str:
+        return f'{self.name}'
+
 class Item(models.Model):
     name = models.CharField("Item Description",max_length=10)
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
@@ -84,7 +95,7 @@ class MaterialRequisition(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
         verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
         related_name='mr')
-
+    category = models.ForeignKey(Category,verbose_name='category',related_name='mr',blank=True,null=True,on_delete=models.SET_NULL)
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
     objects = MaterialRequisitionManager()
@@ -274,14 +285,16 @@ class MRSItem(models.Model):
         iv,created = inventoryItem.objects.get_or_create(
             project = self.mrs.project,
             warehouse = self.mrs.warehouse,
-            item = self.item
+            item = self.item,
+            condition=self.condition
             )
         if created:
             iv.incoming = self.quantity
         else:
             iv.incoming = MRSItem.objects.filter(mrs__project=self.mrs.project,
                                                  mrs__warehouse = self.mrs.warehouse,
-                                                 item = self.item
+                                                 item = self.item,
+                                                 condition=self.condition
                                                  ).aggregate(total=Sum('quantity'))['total']
         iv.save()
 class InventoryItemManager(models.Manager):
@@ -307,10 +320,10 @@ class inventoryItem(models.Model):
         self.remaining = self.incoming - self.outgoing
         super().save(*args,**kwargs)
         
-        inventoryItem.objects.filter(item=self.item,project=self.project).update(
-             total_in_all_warehouse_project=inventoryItem.objects.filter(item=self.item,project=self.project).aggregate(total=Sum('remaining'))['total'])
-        inventoryItem.objects.filter(item=self.item).update(
-             total_in_all=inventoryItem.objects.filter(item=self.item).aggregate(total=Sum('remaining'))['total'])
+        inventoryItem.objects.filter(item=self.item,project=self.project,condition=self.condition).update(
+             total_in_all_warehouse_project=inventoryItem.objects.filter(item=self.item,project=self.project,condition=self.condition).aggregate(total=Sum('remaining'))['total'])
+        inventoryItem.objects.filter(item=self.item,condition=self.condition).update(
+             total_in_all=inventoryItem.objects.filter(item=self.item,condition=self.condition).aggregate(total=Sum('remaining'))['total'])
                 
         
     def __str__(self) -> str:
@@ -328,6 +341,7 @@ class MaterialIssueRequest(models.Model):
     client_department = models.CharField("Client Department",max_length=100)
     sent_to_warehouse = models.BooleanField("sent to warehouse",default=False)
     sent_to_location = models.BooleanField("sent to location",default=False)
+    location = models.CharField("Destination",max_length=100,blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
         verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
         related_name='mir')
@@ -341,7 +355,27 @@ class MaterialIssueRequest(models.Model):
     def __str__(self) -> str:
         return self.number
     def get_edit_url(self):
-        return reverse('mir_edit',kwargs={'id':self.id}) #TODO
+        return reverse('mir_edit',kwargs={'id':self.id}) 
+    def save(self,*args,**kwargs):
+        super().save(*args,**kwargs)
+        if self.sent_to_location:
+            items = self.items.all()
+            for item in items:
+                iv,created = inventoryItem.objects.get_or_create(
+                    project = self.project,
+                    warehouse = self.warehouse,
+                    item = item.item,
+                    condition=item.condition  
+                )
+                iv.outgoing = MIRItem.objects.filter(mir__project=self.project,
+                                                 mir__warehouse = self.warehouse,
+                                                 item = item.item,
+                                                 condition=item.condition
+                                                 ).aggregate(total=Sum('quantity'))['total']
+                iv.save()
+                
+                
+                
 
 class MIRItemManager(models.Manager):
     def get_queryset(self):

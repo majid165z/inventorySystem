@@ -484,7 +484,15 @@ def mrs_edit(request:HttpRequest,id):
 
 @login_required
 def mir_list(request:HttpRequest):
-    mirs = MaterialIssueRequest.objects.all()
+    user = request.user
+    if (not user.is_superuser) and (not user.technical):
+        msg = "you don't have the required permissions."
+        messages.error(request,msg)
+        return redirect("home")
+    if user.is_superuser:
+        mirs = MaterialIssueRequest.objects.all()
+    else:
+        mirs = MaterialIssueRequest.objects.filter(created_by=user)
     context = {
         'title':'Material Issue Request List',
         'mirs':mirs
@@ -494,6 +502,10 @@ def mir_list(request:HttpRequest):
 @login_required
 def mir_add(request:HttpRequest):
     user = request.user
+    if (not user.is_superuser) and (not user.technical):
+         msg = "you don't have the required permissions."
+         messages.error(request,msg)
+         return redirect("home")
     form = MaterialIssueRequestForm(request.POST or None)
     inline_form = None
     if request.method == 'POST' and form.is_valid():
@@ -521,7 +533,14 @@ def mir_add(request:HttpRequest):
 @login_required
 def mir_edit(request:HttpRequest,id):
     user = request.user
+    if (not user.is_superuser) and (not user.technical):
+         msg = "you don't have the required permissions."
+         messages.error(request,msg)
+         return redirect("home")    
     mir = MaterialIssueRequest.objects.get(id=id)
+    if mir.sent_to_warehouse:
+        msg = "This MIR has been sent to warehouse and can not be edited."
+        return redirect('mir_list')
     form = MaterialIssueRequestForm(request.POST or None,instance=mir)
     inline_form = None
     if request.method == 'POST' and form.is_valid():
@@ -551,6 +570,95 @@ def mir_edit(request:HttpRequest,id):
     }
     return render(request,'warehouse/mir-add.html',context)
 
+@login_required
+def send_to_warehouse(request):
+    user = request.user
+    if (not user.is_superuser) and (not user.technical):
+         msg = "you don't have the required permissions."
+         messages.error(request,msg)
+         return redirect("home")    
+    mir = MaterialIssueRequest.objects.get(id=request.POST.get('id',None))
+    if mir.sent_to_warehouse:
+        msg = "This MIR has been sent to warehouse and can not be edited."
+        return redirect('mir_list')
+    else:
+        if user.is_superuser or user == mir.created_by:
+            mir.sent_to_warehouse = True
+            mir.save()
+            msg = f"The MIR : {mir.number} was sent to {mir.warehouse}"
+            messages.success(request,msg)
+            return redirect('mir_list')
+        else:
+            msg = "you don't have the required permissions."
+            messages.error(request,msg)
+            return redirect("home") 
+
+@login_required
+def mir_list_warehouse(request:HttpRequest):
+    user = request.user
+    if (not user.is_superuser) and (not user.warehouse_keeper):
+        msg = "you don't have the required permissions."
+        messages.error(request,msg)
+        return redirect("home")
+    if user.is_superuser:
+        mirs = MaterialIssueRequest.objects.filter(sent_to_warehouse=True)
+    else:
+        mirs = MaterialIssueRequest.objects.filter(sent_to_warehouse=True,warehouse__in=user.whs.all())
+    context = {
+        'title':'Material Issue Request List',
+        'mirs':mirs
+    }
+    return render(request,'warehouse/mir-list-warehouse.html',context)
+
+@login_required
+def send_mir_from_warehouse(request):
+    if request.method == 'POST':
+        user = request.user
+        if user.is_superuser or user.warehouse_keeper:
+            mir = MaterialIssueRequest.objects.get(id=request.POST.get('id',None))
+            if user.is_superuser:
+                if request.POST.get('send_back',None):
+                    mir.sent_to_warehouse = False
+                    mir.save()
+                    msg = "MIR Sent back to Technical unit Successfully."
+                    messages.success(request,msg)
+                    return redirect("mir_list_warehouse")
+                elif request.POST.get('send',None):
+                    if not mir.sent_to_location:
+                        mir.sent_to_location = True
+                        mir.save()
+                        msg = "MIR Sent to location  Successfully."
+                        messages.success(request,msg)
+                        return redirect("mir_list_warehouse")
+                        
+            else:
+                whs = user.whs.all()
+                if mir.warehouse in whs:
+                    if request.POST.get('send_back',None):
+                        mir.sent_to_warehouse = False
+                        mir.save()
+                        msg = "MIR Sent back to Technical unit Successfully."
+                        messages.success(request,msg)
+                        return redirect("mir_list_warehouse")
+                    elif request.POST.get('send',None):
+                        if not mir.sent_to_location:
+                            mir.sent_to_location = True
+                            mir.save()
+                            msg = "MIR Sent to location Successfully."
+                            messages.success(request,msg)
+                            return redirect("mir_list_warehouse")
+                            
+                    
+                else:
+                    msg = "you dont have the required permissions."
+                    messages.error(request,msg)
+                    return redirect("mir_list_warehouse")
+                    
+    msg = "you dont have the required permissions."
+    messages.error(request,msg)
+    return redirect("mir_list_warehouse")
+    
+        
 # # -----------------------------------
 # # ajax calls
 # # -----------------------------------
@@ -639,7 +747,7 @@ def get_mir_formset(request):
 def get_pl_warehouse(request):
     pl_id = request.GET.get('pl_id',None)
     if pl_id:
-        whs = Warehouse.objects.filter(mrs__pl__id=pl_id)
+        whs = Warehouse.objects.filter(mrs__pl__id=pl_id).distinct()
         return render(request,'warehouse/partials/pl_warehouse.html',context={'whs':whs})
 
 @login_required
@@ -656,3 +764,10 @@ def get_warehouse_items(request):
 #         items = POItem.objects.filter(po__id=po_id).values_list('number')
 #         items = MrItem.objects.filter(id__in=items).values_list('id','number')
 #         return JsonResponse({'items':list(items)})
+@login_required
+def get_mir_details(request):
+    user = request.user
+    id = request.GET.get('id',None)
+    if id:
+        mir = MaterialIssueRequest.objects.get(id=id)
+        return render(request,'warehouse/partials/mir_details.html',context={'mir':mir})

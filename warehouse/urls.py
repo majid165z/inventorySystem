@@ -44,6 +44,9 @@ urlpatterns = [
     path('material-issue-request-list',views.mir_list,name='mir_list'),
     path('material-issue-request-add',views.mir_add,name='mir_add'),
     path('material-issue-request-edit/<int:id>',views.mir_edit,name='mir_edit'),
+    path('send_to_warehouse',views.send_to_warehouse,name='send_to_warehouse'),
+    path('mir-list-warehouse',views.mir_list_warehouse,name='mir_list_warehouse'),
+    path('send_mir_from_warehouse',views.send_mir_from_warehouse,name='send_mir_from_warehouse'),
     
     # AJAX calls ----------------------------------------
     path('ajax/create_item_name',views.create_item_name,name='create_item_name'),
@@ -58,5 +61,6 @@ urlpatterns = [
     path('ajax/get_warehouse_items',views.get_warehouse_items,name='get_warehouse_items'),
     path('ajax/get_mir_formset',views.get_mir_formset,name='get_mir_formset'),
     path('ajax/get_pl_warehouse',views.get_pl_warehouse,name='get_pl_warehouse'),
+    path('ajax/get_mir_details',views.get_mir_details,name='get_mir_details'),
     # path('get_po_items',views.get_po_items,name='get_po_items'),
 ]

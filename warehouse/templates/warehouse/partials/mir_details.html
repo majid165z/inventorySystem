@@ -1,0 +1,80 @@
+<div class="col-12 row p-4" >
+    <div class="col-12 col-md-4">
+        <p class="pb-1 mb-1 text-center">Project :</p>
+        <p class="pb-1 mb-1 text-center">{{ mir.project }}</p>
+    </div>
+    <div class="col-12 col-md-4">
+        <p class="pb-1 mb-1 text-center">MR Number:</p>
+        <p class="pb-1 mb-1 text-center">{{ mir.mr }}</p>
+    </div>
+    <div class="col-12 col-md-4">
+        <p class="pb-1 mb-1 text-center">PO Number:</p>
+        <p class="pb-1 mb-1 text-center">{{ mir.po }}</p>
+    </div>
+    <div class="col-12 col-md-4">
+        <p class="pb-1 mb-1 text-center">PL Number:</p>
+        <p class="pb-1 mb-1 text-center">{{ mir.pl }}</p>
+    </div>
+    <div class="col-12 col-md-4">
+        <p class="pb-1 mb-1 text-center">Warehouse:</p>
+        <p class="pb-1 mb-1 text-center">{{ mir.warehouse }}</p>
+    </div>
+
+    <div class="col-12 col-md-4">
+        <p class="pb-1 mb-1 text-center">MIR Number:</p>
+        <p class="pb-1 mb-1 text-center">{{ mir.number }}</p>
+    </div>
+
+    <div class="col-12 col-md-4">
+        <p class="pb-1 mb-1 text-center">Required Date:</p>
+        <p class="pb-1 mb-1 text-center">{{ mir.required_date }}</p>
+    </div>
+    <div class="col-12 col-md-4">
+        <p class="pb-1 mb-1 text-center">Destination:</p>
+        <p class="pb-1 mb-1 text-center">{{ mir.location }}</p>
+    </div>
+
+    <div class="col-12">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">MR Item Num.</th>
+                    <th scope="col">Item description</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Condition</th>
+        
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in mir.items.all %}
+                <tr>
+                    <th scope="row">{{forloop.counter}}</th>
+                    <td>{{item.number}}</td>
+                    <td>
+                        {{item.item}}
+                    </td>
+                    <td>
+                        {{item.quantity}}                        
+                    </td>
+                    <td>
+                        {{item.condition}}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if not mir.sent_to_location %}
+    <form action="{% url 'send_mir_from_warehouse' %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="id" value="{{mir.id}}" hidden>
+        <button type="submit" name="send" class="btn btn-success" value="send">accept and send to location</button>
+        <button type="submit" name="send_back" class="btn btn-danger" value="send_back">send back</button>
+    </form>
+
+    {% endif %}
+
+
+
+</div>

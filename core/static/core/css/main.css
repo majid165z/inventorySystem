@@ -22,3 +22,6 @@ input[type=checkbox] {
 p {
     font-size: larger;
 }
+.dt-row {
+    width: 100% !important;
+}

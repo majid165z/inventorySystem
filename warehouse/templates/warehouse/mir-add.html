@@ -32,6 +32,10 @@ class="row flex justify-content-center align-content-center align-items-center">
             <p class="pb-1 mb-1 text-center">{{ form.warehouse.label_tag }}</p>
             {{ form.warehouse }}
         </div>
+        <div class="col-12 col-md-4">
+            <p class="pb-1 mb-1 text-center">{{ form.location.label_tag }}</p>
+            {{ form.location }}
+        </div>
 
         <div class="col-12 col-md-4">
             <p class="pb-1 mb-1 text-center">{{ form.number.label_tag }}</p>
@@ -118,7 +122,7 @@ class="row flex justify-content-center align-content-center align-items-center">
             let empty_from = $('#empty_form').html();
             let compiledTmpl = empty_from.replace(/__prefix__/g, count);
             formContainer.insertAdjacentHTML('beforeend', compiledTmpl);
-            total_el.setAttribute('value',count+1)
+            total_el.setAttribute('value',Number(count)+1)
             $('input[type=text],input[type=password],input[type=number],textarea').addClass('form-control');
             $('select').addClass('form-select')
         })

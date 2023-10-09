@@ -74,6 +74,8 @@ class="row flex justify-content-center align-content-center align-items-center">
 <script>
 
     $(document).ready(function(){
+
+        
         let total_items = 0
         
         {% if mrs %}
@@ -103,7 +105,7 @@ class="row flex justify-content-center align-content-center align-items-center">
             let empty_from = $('#empty_form').html();
             let compiledTmpl = empty_from.replace(/__prefix__/g, count);
             formContainer.insertAdjacentHTML('beforeend', compiledTmpl);
-            total_el.setAttribute('value',count+1)
+            total_el.setAttribute('value',Number(count)+1)
             $('input[type=text],input[type=password],input[type=number],textarea').addClass('form-control');
             $('select').addClass('form-select')
         })

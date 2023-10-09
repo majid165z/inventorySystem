@@ -21,7 +21,7 @@ def logoutuser(request):
 def user_list(request:HttpRequest):
     user = request.user
     if not user.is_superuser:
-        msg = 'شما دسترسی لازم برای مشاهده این صحفه را ندارید.'
+        msg = "you don't have the required permissions."
         messages.error(request,msg)
         return redirect('home')
     users = get_user_model().objects.all()
@@ -34,7 +34,7 @@ def user_list(request:HttpRequest):
 def create_user(request:HttpRequest):
     user = request.user
     if not user.is_superuser:
-        msg = 'شما دسترسی لازم برای ایجاد کاربر را ندارید'
+        msg = "you don't have the required permissions."
         messages.error(request,msg)
         return redirect('home')
     form = SignUpForm(request.POST or None)
@@ -49,11 +49,11 @@ def create_user(request:HttpRequest):
             obj.first_name = name
             obj.last_name = last_name
             obj.save()
-            msg = 'کاربر با موفقیت ثبت شد.'
+            msg = "The user was successfully created."
             messages.success(request,msg)
             return redirect('user_list')
         else:
-            msg = 'لطفا مجددا تلاش کنید'
+            msg = "Please try again. something went wrong."
             messages.error(request,msg)
     context = {'form':form}
     return render(request,'registration/create_user.html',context)

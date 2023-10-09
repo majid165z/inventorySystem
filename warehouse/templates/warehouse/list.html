@@ -75,6 +75,11 @@
 
 {% block js %}
 <script>
+    $('table').DataTable(
+        {
+        "lengthMenu": [ 25, 50, 75, 100 ]
+        }
+    );
     const warehouseKeeperModal = document.getElementById('warehouseKeeperModal')
 if (warehouseKeeperModal) {
     warehouseKeeperModal.addEventListener('show.bs.modal', event => {
