@@ -2,7 +2,7 @@ from django import forms
 from .models import (Item,Warehouse,Unit,Project,MaterialRequisition,MrItem,
     POItem,ProcurementOrder,
     PackingList,PLItem,MaterialReceiptSheet,MRSItem,Condition,
-    MaterialIssueRequest,MIRItem,Category
+    MaterialIssueRequest,MIRItem,Category,Cluster,PipeLine
     )
 from jalali_date.fields import JalaliDateField, SplitJalaliDateTimeField
 from jalali_date.widgets import AdminJalaliDateWidget, AdminSplitJalaliDateTime
@@ -20,6 +20,15 @@ class UnitForm(forms.ModelForm):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
+        fields = ['name',]
+
+class ClusterForm(forms.ModelForm):
+    class Meta:
+        model = Cluster
+        fields = ['name',]
+class PipeLineForm(forms.ModelForm):
+    class Meta:
+        model = PipeLine
         fields = ['name',]
 
 class ProjectForm(forms.ModelForm):
@@ -40,12 +49,33 @@ class MaterialRequisitionForm(forms.ModelForm):
 class MrItemForm(forms.ModelForm):
     class Mata:
         model = MrItem
-        fields = ['number','tag_number','item','unit','quantity']
+        fields = ['number','tag_number','item','unit','quantity','pipeline','cluster']
+    def __init__(self,*args,**kwargs):
+        items = kwargs.pop('items',None)
+        units = kwargs.pop('units',None)
+        pipes = kwargs.pop('pipes',None)
+        clusters = kwargs.pop('clusters',None)
+        # print(items)
+        super().__init__(*args, **kwargs)
+        if units:
+            item_choices = [("","---------")]
+            unit_choices = [("","--------")]+[(item.id, item.__str__()) for item in units]
+            pipe_choices = [("","--------")]+[(item.id, item.__str__()) for item in pipes]
+            cluster_choices = [("","--------")]+[(item.id, item.__str__()) for item in clusters]
+            self.fields['unit'].choices = unit_choices
+            self.fields['item'].choices = item_choices
+            self.fields['cluster'].choices = cluster_choices
+            self.fields['pipeline'].choices = pipe_choices
+        if self.instance.pk:
+            item_choices = [(self.instance.item.id,self.instance.item.name)]
+            self.fields['item'].choices = item_choices
+
+        
 
 MrItemFromSet = inlineformset_factory(
     MaterialRequisition,MrItem,form=MrItemForm,extra=2,
     can_delete=True,can_delete_extra=True,
-    fields=['number','tag_number','item','unit','quantity']
+    fields=['number','tag_number','item','unit','quantity','pipeline','cluster']
 )
 
 class ProcurementOrderForm(forms.ModelForm):
@@ -62,15 +92,22 @@ class ProcurementOrderForm(forms.ModelForm):
 
 class POItemForm(forms.ModelForm):
     class Mata:
-        model = MrItem
-        fields = ['number','item','unit','quantity']
+        model = POItem
+        fields = ['number','item','unit','quantity','pipeline','cluster']
     def __init__(self, *args, **kwargs):
-        mr = kwargs.pop('mr',None)
+        mritems = kwargs.pop('mritems',None)
+        items = kwargs.pop('items',None)
+        units = kwargs.pop('units',None)
+        pipes = kwargs.pop('pipes',None)
+        clusters = kwargs.pop('clusters',None)
+        
         super().__init__(*args, **kwargs)
-        if mr:
-            mritems = [('','---------')] + list(mr.items.all().values_list('id','number'))
+        if mritems:
             self.fields['number'].widget = forms.Select(choices=mritems)
-            self.fields['item'].queryset = Item.objects.filter(mritems__mr=mr)
+            self.fields['item'].choices = items
+            self.fields['unit'].choices = units
+            self.fields['cluster'].choices = clusters
+            self.fields['pipeline'].choices = pipes
         
         # if self.instance.pk:
         #     mritems = self.instance.po.mr.items.all().values_list('id','number')
@@ -83,7 +120,7 @@ class POItemForm(forms.ModelForm):
 POItemFromSet = inlineformset_factory(
     ProcurementOrder,POItem,form=POItemForm,extra=2,
     can_delete=True,can_delete_extra=True,
-    fields=['number','item','unit','quantity']
+    fields=['number','item','unit','quantity','cluster','pipeline']
 )
 
 class PackingListForm(forms.ModelForm):

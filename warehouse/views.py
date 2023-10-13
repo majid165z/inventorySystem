@@ -4,7 +4,7 @@ from .forms import (UnitForm,ProjectForm,
     ProcurementOrderForm,POItemFromSet,
     PackingListForm,PLItemForm,PLItemFromSet,
     MaterialReceiptSheetForm,MRSItemFromSet,ConditionForm,
-    MaterialIssueRequestForm,MIRItemFromSet,CategoryForm
+    MaterialIssueRequestForm,MIRItemFromSet,CategoryForm,ClusterForm,PipeLineForm
     )
 from django.http import HttpRequest,JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -14,9 +14,13 @@ POItem, ProcurementOrder,
 PackingList,
 MaterialReceiptSheet,MRSItem,
 Condition,inventoryItem,
-MaterialIssueRequest,MIRItem,Category
+MaterialIssueRequest,MIRItem,Category,
+Cluster,PipeLine
 )
 from django.db.models import Sum, Q
+from django.views.decorators.csrf import csrf_exempt
+from django.forms import inlineformset_factory
+
 # Create your views here.
 
 @login_required
@@ -126,6 +130,104 @@ def category_edit(request:HttpRequest,id):
         'form' : form
     }
     return render(request,'warehouse/unit_add.html',context)
+
+@login_required
+def cluster_list(request:HttpRequest):
+    units = Cluster.objects.all()
+    context = {'title':'Clusters',
+    'units':units
+    }
+    return render(request,'warehouse/cluster_list.html',context)
+
+@login_required
+def cluster_add(request:HttpRequest):
+    user = request.user
+    if not user.is_superuser:
+        msg = "You don't have the required permission."
+        messages.error(request,msg)
+        return redirect('cluster_list')
+    form = ClusterForm(request.POST or None)
+    if form.is_valid():
+        obj = form.save(commit=False)
+        obj.created_by = user
+        obj.save()
+        msg = "The Cluster was created successfully."
+        messages.success(request,msg)
+        return redirect('cluster_list')
+    context = {
+        'title': "Create Cluster",
+        'form' : form
+    }
+    return render(request,'warehouse/unit_add.html',context)
+@login_required
+def cluster_edit(request:HttpRequest,id):
+    user = request.user
+    if not user.is_superuser:
+        msg = "You don't have the required permission."
+        messages.error(request,msg)
+        return redirect('cluster_list')
+    instance = Cluster.objects.get(id=id)
+    form = ClusterForm(request.POST or None,instance=instance)
+    if form.is_valid():
+        obj = form.save()
+        msg = "The Categort was edited successfully."
+        messages.success(request,msg)
+        return redirect('cluster_list')
+    context = {
+        'title': "Edit Cluster",
+        'form' : form
+    }
+    return render(request,'warehouse/unit_add.html',context)
+
+
+@login_required
+def pipe_line_list(request:HttpRequest):
+    units = PipeLine.objects.all()
+    context = {'title':'Pipe Line',
+    'units':units
+    }
+    return render(request,'warehouse/pipeline_list.html',context)
+
+@login_required
+def pipe_line_add(request:HttpRequest):
+    user = request.user
+    if not user.is_superuser:
+        msg = "You don't have the required permission."
+        messages.error(request,msg)
+        return redirect('pipe_line_list')
+    form = PipeLineForm(request.POST or None)
+    if form.is_valid():
+        obj = form.save(commit=False)
+        obj.created_by = user
+        obj.save()
+        msg = "The Pipe Line was created successfully."
+        messages.success(request,msg)
+        return redirect('pipe_line_list')
+    context = {
+        'title': "Create Pipe Line",
+        'form' : form
+    }
+    return render(request,'warehouse/unit_add.html',context)
+@login_required
+def pipe_line_edit(request:HttpRequest,id):
+    user = request.user
+    if not user.is_superuser:
+        msg = "You don't have the required permission."
+        messages.error(request,msg)
+        return redirect('pipe_line_list')
+    instance = PipeLine.objects.get(id=id)
+    form = PipeLineForm(request.POST or None,instance=instance)
+    if form.is_valid():
+        obj = form.save()
+        msg = "The Pipe Line was edited successfully."
+        messages.success(request,msg)
+        return redirect('pipe_line_list')
+    context = {
+        'title': "Edit Pipe Line",
+        'form' : form
+    }
+    return render(request,'warehouse/unit_add.html',context)
+
 @login_required
 def unit_list(request:HttpRequest):
     units = Unit.objects.all()
@@ -225,35 +327,81 @@ def project_edit(request:HttpRequest,id):
     return render(request,'warehouse/project_add.html',context)
 
 @login_required
+@csrf_exempt
 def mr_list(request:HttpRequest):
-    mrs = MaterialRequisition.objects.all()
-    context = {
-        'title':'MR List',
-        'mrs':mrs
-    }
-    return render(request,'warehouse/mr-list.html',context)
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        mr = MaterialRequisition.objects.get(id=id)
+        count = mr.pos.all().count()
+        if not count:
+            if request.user.is_superuser or request.user.technical:
+                mr.delete()
+                return JsonResponse({
+                    "success":True,
+                    "msg":f"The MR: {mr.number} was deleted successfully."
+                })
+            else:
+                return JsonResponse({
+                    "success":False,
+                    "msg":"you dont have required permission."
+                })
+        else:
+            return JsonResponse({
+                "success":False,
+                "msg":"This MR have been used by some POs. You should delete does POs first."
+            })
+    else:
+        mrs = MaterialRequisition.objects.all()
+        context = {
+            'title':'MR List',
+            'mrs':mrs
+        }
+        return render(request,'warehouse/mr-list.html',context)
 
 @login_required
 def mr_add(request:HttpRequest):
     user = request.user
     form = MaterialRequisitionForm(request.POST or None)
     inline_form = None
+    units = Unit.objects.all()
+    items = Item.objects.all()
+    pipes = PipeLine.objects.all()
+    clusters = Cluster.objects.all()
     if request.method == 'POST' and form.is_valid():
         obj = form.save(commit=False)
-        inline_form = MrItemFromSet(request.POST,instance=obj)
+        inline_form = MrItemFromSet(request.POST,instance=obj,
+                        form_kwargs={'units':units,
+                                    'items':items,
+                                    'pipes':pipes,
+                                    'clusters':clusters
+                                    }
+                        )
         if inline_form.is_valid():
             obj.created_by = user
             obj.save()
             inline_form.save()
             msg = 'MR was Created successfully.'
             messages.success(request,msg)
-            return redirect('mr_list')
+            return redirect('mr_edit',id=obj.id)
         
-    
+    if inline_form:
+        formset = inline_form
+    else:
+        formset = MrItemFromSet(request.POST or None,
+                                form_kwargs={'units':units,
+                                    'items':items,
+                                    'pipes':pipes,
+                                    'clusters':clusters
+                                    }
+                                )
+        # for form_ in formset:
+        #     form_.fields['unit'] = 
+        #     form_.fields['item'] = 
+        
     context = {
         'title': 'Create MR',
         'form':form,
-        'formset':inline_form or MrItemFromSet(request.POST or None)
+        'formset':formset
     }
     return render(request,'warehouse/mr-add.html',context)
 
@@ -261,33 +409,76 @@ def mr_add(request:HttpRequest):
 def mr_edit(request:HttpRequest,id):
     user = request.user
     mr = MaterialRequisition.objects.get(id=id)
+    units = Unit.objects.all()
+    items = Item.objects.all()
+    pipes = PipeLine.objects.all()
+    clusters = Cluster.objects.all()
+
     form = MaterialRequisitionForm(request.POST or None,instance=mr)
     inline_form = None
     if form.is_valid():
         obj = form.save()
-        inline_form = MrItemFromSet(request.POST,instance=obj)
+        inline_form = MrItemFromSet(request.POST,instance=obj,
+                            form_kwargs={
+                                'units':units,
+                                'items':items,
+                                'pipes':pipes,
+                                'clusters':clusters
+                                }
+                            )
         if inline_form.is_valid():
             inline_form.save()
             msg = 'MR was edited successfully.'
             messages.success(request,msg)
             return redirect('mr_list')
-        
+    if inline_form:
+        formset = inline_form
+    else:
+        formset = MrItemFromSet(form_kwargs={
+            'units':units,
+            'items':items,
+            'pipes':pipes,
+            'clusters':clusters
+            },instance=mr)
     
     context = {
         'title': 'Edit MR',
         'form':form,
-        'formset':inline_form or MrItemFromSet(request.POST or None,instance=mr)
+        'formset':formset
     }
     return render(request,'warehouse/mr-add.html',context)
 
 @login_required
+@csrf_exempt
 def po_list(request:HttpRequest):
-    pos = ProcurementOrder.objects.all()
-    context = {
-        'title':'PO List',
-        'pos':pos
-    }
-    return render(request,'warehouse/po-list.html',context)
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        po = ProcurementOrder.objects.get(id=id)
+        count = po.pls.all().count()
+        if not count:
+            if request.user.is_superuser or request.user.technical:
+                po.delete()
+                return JsonResponse({
+                    "success":True,
+                    "msg":f"The PO: {po.number} was deleted successfully."
+                })
+            else:
+                return JsonResponse({
+                    "success":False,
+                    "msg":"you dont have required permission."
+                })
+        else:
+            return JsonResponse({
+                "success":False,
+                "msg":"This PO have been used by some PLs. You should delete does Pls first."
+            })
+    else:
+        pos = ProcurementOrder.objects.all()
+        context = {
+            'title':'PO List',
+            'pos':pos
+        }
+        return render(request,'warehouse/po-list.html',context)
 
 @login_required
 def po_add(request:HttpRequest):
@@ -297,7 +488,7 @@ def po_add(request:HttpRequest):
     items = None
     if request.method == 'POST' and form.is_valid():
         obj = form.save(commit=False)
-        inline_form = POItemFromSet(request.POST,instance=obj,form_kwargs={"mr":obj.mr})
+        inline_form = POItemFromSet(request.POST,instance=obj)
         if inline_form.is_valid():
             obj.created_by = user
             obj.save()
@@ -320,9 +511,21 @@ def po_edit(request:HttpRequest,id):
     po = ProcurementOrder.objects.get(id=id)
     form = ProcurementOrderForm(request.POST or None,instance=po)
     inline_form = None
-    if form.is_valid():
-        obj = form.save()
-        inline_form = POItemFromSet(request.POST,instance=po,form_kwargs={'mr':po.mr})
+    mr = po.mr
+    mritems = [('','---------')] + list(mr.items.all().values_list('id','number'))
+    items = Item.objects.filter(mritems__mr=mr)
+    items = [("","-------")] + [(item.id, item.__str__()) for item in items]
+    units = [("","-------")] + [(item.id, item.__str__()) for item in Unit.objects.all()]
+    pipes = [("","--------")]+[(item.id, item.__str__()) for item in PipeLine.objects.all()]
+    clusters = [("","--------")]+[(item.id, item.__str__()) for item in Cluster.objects.all()]
+    
+    
+    if request.method == 'POST' and form.is_valid():
+        obj = form.save()        
+        inline_form = POItemFromSet(request.POST or None,instance=po,form_kwargs={'mritems':mritems,'items':items,'units':units,'pipes':pipes,'clusters':clusters})
+        
+        
+        # inline_form = POItemFromSet(request.POST,instance=po,form_kwargs={'mr':po.mr})
         if inline_form.is_valid():
             inline_form.save()
             msg = 'PO was edited successfully.'
@@ -336,9 +539,15 @@ def po_edit(request:HttpRequest,id):
     if inline_form:
         formset = inline_form
     else:
-        formset = POItemFromSet(request.POST or None,instance=po,form_kwargs={'mr':po.mr})
-        formset.extra = 0
-
+        formset = POItemFromSet(request.POST or None,instance=po,form_kwargs={'mritems':mritems,'items':items,'units':units,'pipes':pipes,'clusters':clusters})
+        # formset.extra = 2
+        # POItemFromSet = inlineformset_factory(
+        #     ProcurementOrder,POItem,form=POItemForm,extra=2,
+        #     can_delete=True,can_delete_extra=True,
+        #     fields=['number','item','unit','quantity','cluster','pipeline']
+        # )        
+        
+        print(formset)
     context = {
         'title': 'Edit PO',
         'form':form,
@@ -721,7 +930,14 @@ def get_po_formset(request):
     mr_id = request.GET.get('mr_id',None)
     if mr_id:
         mr = MaterialRequisition.objects.get(id=mr_id)
-        formset = POItemFromSet(form_kwargs={'mr':mr})
+        mritems = [('','---------')] + list(mr.items.all().values_list('id','number'))
+        items = Item.objects.filter(mritems__mr=mr)
+        items = [("","-------")] + [(item.id, item.__str__()) for item in items]
+        units = [("","-------")] + [(item.id, item.__str__()) for item in Unit.objects.all()]
+        pipes = [("","--------")]+[(item.id, item.__str__()) for item in PipeLine.objects.all()]
+        clusters = [("","--------")]+[(item.id, item.__str__()) for item in Cluster.objects.all()]
+        
+        formset = POItemFromSet(form_kwargs={'mritems':mritems,'items':items,'units':units,'pipes':pipes,'clusters':clusters})
         return render(request,'warehouse/partials/po_form.html',context={'formset':formset})
 @login_required
 def get_project_mr(request:HttpRequest):
@@ -747,10 +963,13 @@ def get_item_desc(request:HttpRequest):
     item_id = request.GET.get('id',None)
     if item_id:
         item = MrItem.objects.get(id=item_id)
+        
         return JsonResponse(
             {
                 'name':item.item.id,
                 'unit':item.unit.id,
+                'cluster':item.cluster.id if item.cluster else False,
+                'pipeline':item.pipeline.id if item.pipeline else False
 
             }
         )
@@ -818,3 +1037,14 @@ def get_mir_details(request):
     if id:
         mir = MaterialIssueRequest.objects.get(id=id)
         return render(request,'warehouse/partials/mir_details.html',context={'mir':mir})
+
+@login_required
+def get_items_ajax(request):
+    term = request.GET.get("term",None)
+    if term:
+        items = Item.objects.filter(name__contains=term)
+        items = [{"id":item.id,"text":item.name} for item in items]
+        return JsonResponse({"results":items})
+    else:
+        return JsonResponse({})
+    

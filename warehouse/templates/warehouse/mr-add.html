@@ -6,7 +6,7 @@
 class="row flex justify-content-center align-content-center align-items-center">
     {% csrf_token %}
 
-    <div class="col-12 col-md-10 row rounded bg-white p-5" >
+    <div class="col-12 col-md-11 row rounded bg-white py-5" >
         {% if form.errors %}
           {% for key,value in form.errors.items %} 
             <p class="text-red">{{ value|escape }}</p>
@@ -39,15 +39,22 @@ class="row flex justify-content-center align-content-center align-items-center">
                 <p class="pb-1 mb-1 text-center">{{ formset.empty_form.number.label_tag }}</p>
             </div>
 
-            <div class="col-12 col-md-2">
+            <div class="col-12 col-md-1">
                 <p class="pb-1 mb-1 text-center">{{ formset.empty_form.tag_number.label_tag }}</p>
             </div>
             <div class="col-12 col-md-5">
                 <p class="pb-1 mb-1 text-center">{{ formset.empty_form.item.label_tag }}</p>
             </div>
-            <div class="col-12 col-md-2">
+            <div class="col-12 col-md-1">
                 <p class="pb-1 mb-1 text-center">{{ formset.empty_form.unit.label_tag }}</p>
             </div>
+            <div class="col-12 col-md-1">
+                <p class="pb-1 mb-1 text-center">{{ formset.empty_form.cluster.label_tag }}</p>
+            </div>
+            <div class="col-12 col-md-1">
+                <p class="pb-1 mb-1 text-center">{{ formset.empty_form.pipeline.label_tag }}</p>
+            </div>
+
             <div class="col-12 col-md-2">
                 <p class="pb-1 mb-1 text-center">{{ formset.empty_form.quantity.label_tag }}</p>
             </div>
@@ -55,7 +62,7 @@ class="row flex justify-content-center align-content-center align-items-center">
         </div>
         <div id="formset_container">  
         {% for forms in formset %}
-            <div class="row p-0 m-0 my-1">
+            <div class="row p-0 m-0 my-1 form-row">
                 {{forms.id}}
                 <div class="col-12 col-md-1 p-1">
                     <!-- <p class="pb-1 mb-1">{{ forms.number.label_tag }}</p> -->
@@ -63,7 +70,7 @@ class="row flex justify-content-center align-content-center align-items-center">
                     {{forms.number.errors}}
                 </div>
 
-                <div class="col-12 col-md-2 p-1">
+                <div class="col-12 col-md-1 p-1">
                     <!-- <p class="pb-1 mb-1">{{ forms.tag_number.label_tag }}</p> -->
                     {{ forms.tag_number }}
                     {{forms.tag_number.errors}}
@@ -73,16 +80,45 @@ class="row flex justify-content-center align-content-center align-items-center">
                     {{ forms.item }}
                     {{forms.item.errors}}
                 </div>
-                <div class="col-12 col-md-2 p-1">
+                <div class="col-12 col-md-1 p-1">
                     <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
                     {{ forms.unit }}
                     {{forms.unit.errors}}
                 </div>
+                <div class="col-12 col-md-1 p-1">
+                    <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+                    {{ forms.cluster }}
+                    {{forms.cluster.errors}}
+                </div>
+                <div class="col-12 col-md-1 p-1">
+                    <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+                    {{ forms.pipeline }}
+                    {{forms.pipeline.errors}}
+                </div>
+
                 <div class="col-12 col-md-2 p-1">
                     <!-- <p class="pb-1 mb-1">{{ forms.quantity.label_tag }}</p> -->
-                    {{ forms.quantity }}
-                    {{forms.quantity.errors}}
+                    <div class="row m-0 p-0">
+                        <div class="col-10 p-0">
+                            {{ forms.quantity }}
+                            {{forms.quantity.errors}}
+        
+                        </div>
+                        <div  class="col-1 p-1 mt-1">
+                            <span class="delete">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="red" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                                  </svg>
+                            </span>
+                            {{ forms.DELETE }}
+                            {{forms.DELETE.errors}}
+        
+                        </div>
+    
+                    </div>
                 </div>
+
 
             </div>
         {% endfor %}
@@ -109,14 +145,14 @@ class="row flex justify-content-center align-content-center align-items-center">
 {{form.media}}
 {{formset.media}}
 <script type="text/html" id="item-template"> 
-    <div class="row p-0 m-0 my-1">
+    <div class="row p-0 m-0 my-1 form-row">
         {{formset.empty_form.id}}
         <div class="col-12 col-md-1 p-1">
             <!-- <p class="pb-1 mb-1">{{ forms.number.label_tag }}</p> -->
             {{ formset.empty_form.number }}
         </div>
 
-        <div class="col-12 col-md-2 p-1">
+        <div class="col-12 col-md-1 p-1">
             <!-- <p class="pb-1 mb-1">{{ forms.tag_number.label_tag }}</p> -->
             {{ formset.empty_form.tag_number }}
         </div>
@@ -124,13 +160,40 @@ class="row flex justify-content-center align-content-center align-items-center">
             <!-- <p class="pb-1 mb-1">{{ forms.item.label_tag }}</p> -->
             {{ formset.empty_form.item }}
         </div>
-        <div class="col-12 col-md-2 p-1">
+        <div class="col-12 col-md-1 p-1">
             <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
             {{ formset.empty_form.unit }}
         </div>
+        <div class="col-12 col-md-1 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+            {{ formset.empty_form.cluster }}
+        </div>
+        <div class="col-12 col-md-1 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+            {{ formset.empty_form.pipeline }}
+        </div>
+        
         <div class="col-12 col-md-2 p-1">
             <!-- <p class="pb-1 mb-1">{{ forms.quantity.label_tag }}</p> -->
-            {{ formset.empty_form.quantity }}
+            <div class="row m-0 p-0">
+                <div class="col-10 p-0">
+                    {{ formset.empty_form.quantity }}
+                    {{formset.empty_form.quantity.errors}}
+
+                </div>
+                <div  class="col-1 p-1 mt-1">
+                    <span class="delete">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" color="red" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                          </svg>
+                    </span>
+                    {{ formset.empty_form.DELETE }}
+                    {{formset.empty_form.DELETE.errors}}
+
+                </div>
+
+            </div>
         </div>
 
     </div>
@@ -138,9 +201,23 @@ class="row flex justify-content-center align-content-center align-items-center">
 <script>
     $(document).ready(function(){
         $.noConflict()
+        $('input[type=checkbox]').hide()
+        let deletes = document.querySelectorAll(".delete")
+        deletes.forEach(function(element){
+            element.addEventListener('click',function(event){
+                let target = event.currentTarget
+                target.nextElementSibling.click()
+                target.closest(".form-row").style.display = 'none'
+                //console.log(target.nextElementSibling)
+            })
+        })
         let selectOpt = $("select[id$='-item']")
 
         selectOpt.select2({
+            ajax : {
+                url : '{% url "get_items_ajax" %}',
+                dataType:'json'
+            },
             tags: true,
             createTag: function (params) {
                 var term = $.trim(params.term);
@@ -190,12 +267,16 @@ class="row flex justify-content-center align-content-center align-items-center">
             let tmplMarkup = $('#item-template').html();
             let compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
             formContainer.insertAdjacentHTML('beforeend', compiledTmpl);
-            total_el.setAttribute('value',count+1)
+            total_el.setAttribute('value',Number(count)+1)
             $('input[type=text],input[type=password],input[type=number],textarea').addClass('form-control');
             $('select').addClass('form-select');
             let selectOpt = $("select[id$='-item']")
 
             selectOpt.select2({
+                ajax : {
+                url : '{% url "get_items_ajax" %}',
+                dataType:'json'
+                },
                 tags: true,
                 createTag: function (params) {
                     var term = $.trim(params.term);
@@ -213,7 +294,16 @@ class="row flex justify-content-center align-content-center align-items-center">
             $(".select2-container").addClass("w-100")
             $(".select2-selection__rendered").addClass('form-control py-1')
             $('.select2-selection').addClass('border-0')
-    
+            $('input[type=checkbox]').hide()
+            let newdel = document.querySelectorAll(".delete")
+            newdel.forEach(function(element){
+                element.addEventListener('click',function(event){
+                    let target = event.currentTarget
+                    target.nextElementSibling.click()
+                    target.closest(".form-row").style.display = 'none'
+                    //console.log(target.nextElementSibling)
+                })
+            })
     
 
 

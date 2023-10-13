@@ -17,6 +17,32 @@ class Category(models.Model):
         verbose_name_plural = "categories"
     def __str__(self) -> str:
         return f'{self.name}'
+class Cluster(models.Model):
+    name = models.CharField("Category Name",max_length=50)
+    created = models.DateTimeField(auto_now=False,auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+        verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
+        related_name='clusters')
+    
+    class Meta:
+        verbose_name = "Cluster"
+        verbose_name_plural = "Clusters"
+    def __str__(self) -> str:
+        return f'{self.name}'
+class PipeLine(models.Model):
+    name = models.CharField("Category Name",max_length=50)
+    created = models.DateTimeField(auto_now=False,auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True,auto_now_add=False)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL,
+        verbose_name='ثبت شده توسط',null=True,on_delete=models.SET_NULL,
+        related_name='pipelines')
+    
+    class Meta:
+        verbose_name = "Pipe Line"
+        verbose_name_plural = "Pipe Lines"
+    def __str__(self) -> str:
+        return f'{self.name}'
 
 class Item(models.Model):
     name = models.CharField("Item Description",max_length=10)
@@ -114,14 +140,16 @@ class MaterialRequisition(models.Model):
 
 class MrItemManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().select_related('mr','unit','item')
+        return super().get_queryset().select_related('mr','unit','item','cluster','pipeline')
 class MrItem(models.Model):
     mr = models.ForeignKey(MaterialRequisition,related_name='items',on_delete=models.CASCADE)
     number = models.PositiveIntegerField('Item Number')
-    tag_number = models.CharField('MESC Number',max_length=200,blank=True)
+    tag_number = models.CharField('Size',max_length=200,blank=True)
     item = models.ForeignKey(Item,related_name='mritems',on_delete=models.CASCADE,verbose_name='Item Description')
     unit = models.ForeignKey(Unit,on_delete=models.SET_NULL,null=True,related_name='items',verbose_name='Unit')
     quantity = models.DecimalField('Quantity',max_digits=10,decimal_places=3)
+    cluster = models.ForeignKey(Cluster,blank=True,null=True,on_delete=models.SET_NULL,verbose_name="cluster")
+    pipeline = models.ForeignKey(PipeLine,blank=True,null=True,on_delete=models.SET_NULL,verbose_name="pipe line")
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
     objects = MrItemManager()
@@ -167,6 +195,8 @@ class POItem(models.Model):
     item = models.ForeignKey(Item,related_name='poitems',on_delete=models.CASCADE,verbose_name='Item Description')
     unit = models.ForeignKey(Unit,on_delete=models.SET_NULL,null=True,related_name='poitems',verbose_name='Unit')
     quantity = models.DecimalField('Quantity',max_digits=10,decimal_places=3)
+    cluster = models.ForeignKey(Cluster,blank=True,null=True,on_delete=models.SET_NULL,verbose_name="cluster",related_name='poitems')
+    pipeline = models.ForeignKey(PipeLine,blank=True,null=True,on_delete=models.SET_NULL,verbose_name="pipe line",related_name='poitems')
     created = models.DateTimeField(auto_now=False,auto_now_add=True)
     updated = models.DateTimeField(auto_now=True,auto_now_add=False)
     objects = POItemManager()

@@ -9,18 +9,27 @@ submit the details here.
         <p class="pb-1 mb-1 text-center">{{ formset.empty_form.number.label_tag }}</p>
     </div>
 
-    <div class="col-12 col-md-6">
+    <div class="col-12 col-md-5">
         <p class="pb-1 mb-1 text-center">{{ formset.empty_form.item.label_tag }}</p>
     </div>
-    <div class="col-12 col-md-3">
+    <div class="col-12 col-md-2">
         <p class="pb-1 mb-1 text-center">{{ formset.empty_form.unit.label_tag }}</p>
     </div>
     <div class="col-12 col-md-2">
+        <p class="pb-1 mb-1 text-center">{{ formset.empty_form.cluster.label_tag }}</p>
+    </div>
+    <div class="col-12 col-md-1">
+        <p class="pb-1 mb-1 text-center">{{ formset.empty_form.pipeline.label_tag }}</p>
+    </div>
+
+    <div class="col-12 col-md-1">
         <p class="pb-1 mb-1 text-center">{{ formset.empty_form.quantity.label_tag }}</p>
     </div>
 
+
 </div>
 <div id="formset_container">  
+    
 {% for forms in formset %}
     <div class="row p-0 m-0 my-1">
         {{forms.id}}
@@ -30,17 +39,29 @@ submit the details here.
             {{forms.number.errors}}
         </div>
 
-        <div class="col-12 col-md-6 p-1">
+        <div class="col-12 col-md-5 p-1">
             <!-- <p class="pb-1 mb-1">{{ forms.item.label_tag }}</p> -->
             {{ forms.item }}
             {{forms.item.errors}}
         </div>
-        <div class="col-12 col-md-3 p-1">
+        <div class="col-12 col-md-2 p-1">
             <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
             {{ forms.unit }}
             {{forms.unit.errors}}
         </div>
         <div class="col-12 col-md-2 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+            {{ forms.cluster }}
+            {{forms.cluster.errors}}
+        </div>
+
+        <div class="col-12 col-md-1 p-1">
+            <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+            {{ forms.pipeline }}
+            {{forms.pipeline.errors}}
+        </div>
+
+        <div class="col-12 col-md-1 p-1">
             <!-- <p class="pb-1 mb-1">{{ forms.quantity.label_tag }}</p> -->
             {{ forms.quantity }}
             {{forms.quantity.errors}}
@@ -59,17 +80,27 @@ submit the details here.
         {{formset.empty_form.number.errors}}
     </div>
 
-    <div class="col-12 col-md-6 p-1">
+    <div class="col-12 col-md-5 p-1">
         <!-- <p class="pb-1 mb-1">{{ forms.item.label_tag }}</p> -->
         {{ formset.empty_form.item }}
         {{formset.empty_form.item.errors}}
     </div>
-    <div class="col-12 col-md-3 p-1">
+    <div class="col-12 col-md-2 p-1">
         <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
         {{ formset.empty_form.unit }}
         {{formset.empty_form.unit.errors}}
     </div>
     <div class="col-12 col-md-2 p-1">
+        <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+        {{ formset.empty_form.cluster }}
+        {{formset.empty_form.cluster.errors}}
+    </div>
+    <div class="col-12 col-md-1 p-1">
+        <!-- <p class="pb-1 mb-1">{{ forms.unit.label_tag }}</p> -->
+        {{ formset.empty_form.pipeline }}
+        {{formset.empty_form.pipeline.errors}}
+    </div>
+    <div class="col-12 col-md-1 p-1">
         <!-- <p class="pb-1 mb-1">{{ forms.quantity.label_tag }}</p> -->
         {{ formset.empty_form.quantity }}
         {{formset.empty_form.quantity.errors}}

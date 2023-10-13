@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %} {% block content %}
+{% load jalali_tags %}
+<div class="col-12 col-md-10 rounded p-5 mx-auto bg-white">
+    <a class="btn btn-primary" style="float: right;" href="{% url 'cluster_add' %}">+
+        Create Cluster
+    </a>
+
+    {% if units %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Category Name</th>
+                <th scope="col">Created By</th>
+                <th scope="col">Date Submited</th>
+    
+            </tr>
+        </thead>
+        <tbody>
+            {% for unit in units %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td><a href="{{unit.get_edit_url}}">{{unit}}</a></td>
+                <td>
+                    {{unit.created_by.first_name}} {{unit.created_by.last_name}} ({{unit.created_by}})
+                </td>
+                <td>
+                    {{unit.created|to_jalali:'%Y/%m/%d'}}
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h1>There is no Cluster submited.</h1>
+    {% endif %}    
+</div>
+{% endblock %}

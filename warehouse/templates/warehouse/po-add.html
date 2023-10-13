@@ -75,6 +75,21 @@ class="row flex justify-content-center align-content-center align-items-center">
         $("select[id$='-unit']").each(function (i, el) {
             $('#'+el.getAttribute("id")).prop('disabled',true)
         })
+        $("select[id$='-pipeline']").each(function (i, el) {
+            $('#'+el.getAttribute("id")).prop('disabled',true)
+        })
+
+        $("select[id$='-cluster']").each(function (i, el) {
+            $('#'+el.getAttribute("id")).prop('disabled',true)
+        })
+        let err = $('.nonfield')
+        if (err.length > 0) {
+            //err.hide()
+            $('#id_items-TOTAL_FORMS').setAttribute("value",0)
+            
+        }
+
+
 
         $('#id_mr').prop('disabled', true)
         $("select[id$='-item']").prop('disabled', true)
@@ -113,6 +128,8 @@ class="row flex justify-content-center align-content-center align-items-center">
                     $('select').addClass('form-select');
                     $("select[id$='-item']").prop('disabled',true)
                     $("select[id$='-unit']").prop('disabled',true)
+                    $("select[id$='-cluster']").prop('disabled',true)
+                    $("select[id$='-pipeline']").prop('disabled',true)
         
                 })
             } else {
@@ -135,6 +152,16 @@ class="row flex justify-content-center align-content-center align-items-center">
                     $("#"+decs_id).val(data.name).change()
                     let unit_id = ev_id.replace("-number","-unit")
                     $("#"+unit_id).val(data.unit).change()
+                    if(data.cluster){
+                        let cluster_id = ev_id.replace("-number","-cluster")
+                        $("#"+cluster_id).val(data.cluster).change()
+                    }
+
+                    if(data.pipeline){
+                        let pipeline_id = ev_id.replace("-number","-pipeline")
+                        $("#"+pipeline_id).val(data.pipeline).change()
+                    }
+
                 })
             }
         })
@@ -148,7 +175,7 @@ class="row flex justify-content-center align-content-center align-items-center">
             empty_form = empty_form.clone(true).html()
             let compiledTmpl = empty_form.replace(/__prefix__/g, count);
             formContainer.insertAdjacentHTML('beforeend', compiledTmpl);
-            total_el.setAttribute('value',count+1)
+            total_el.setAttribute('value',Number(count)+1)
 
         })
 

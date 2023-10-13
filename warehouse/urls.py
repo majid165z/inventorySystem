@@ -38,6 +38,15 @@ urlpatterns = [
     path('category-list',views.category_list,name='category_list'),
     path('category-add',views.category_add,name='category_add'),
     path('category-edit/<int:id>',views.category_edit,name='category_edit'),
+    # clusters urls
+    path('cluster-list',views.cluster_list,name='cluster_list'),
+    path('cluster-add',views.cluster_add,name='cluster_add'),
+    path('cluster-edit/<int:id>',views.cluster_edit,name='cluster_edit'),
+    # pipe line urls
+    path('pipe-line-list',views.pipe_line_list,name='pipe_line_list'),
+    path('pipe-line-add',views.pipe_line_add,name='pipe_line_add'),
+    path('pipe-line-edit/<int:id>',views.pipe_line_edit,name='pipe_line_edit'),
+
 
     # Material Reciept Sheet Urls
     path('material-receipt-sheet-add',views.mrs_add,name='mrs_add'),
@@ -66,5 +75,6 @@ urlpatterns = [
     path('ajax/get_mir_formset',views.get_mir_formset,name='get_mir_formset'),
     path('ajax/get_pl_warehouse',views.get_pl_warehouse,name='get_pl_warehouse'),
     path('ajax/get_mir_details',views.get_mir_details,name='get_mir_details'),
+    path('ajax/get_items_ajax',views.get_items_ajax,name='get_items_ajax')
     # path('get_po_items',views.get_po_items,name='get_po_items'),
 ]
